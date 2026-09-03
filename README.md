@@ -172,6 +172,9 @@ GET     /api/comments/post/{postId}
 PUT     /api/comments/{commentId}
 DELETE  /api/comments/{commentId}
 
+Health
+GET     /api/health
+
 
 Endpoint names may evolve as the application develops.
 
