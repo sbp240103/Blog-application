@@ -1,15 +1,15 @@
 package com.project.app.services.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.autoconfigure.WebMvcProperties.Apiversion.Use;
 import org.springframework.stereotype.Service;
 
 import com.project.app.payloads.UserDto;
 import com.project.app.repositories.UserRepo;
 import com.project.app.services.UserService;
-import com.project.app.entities.*;
+import com.project.app.entities.User;
 import com.project.app.exceptions.ResouceNotFoundException;
 
 @Service
@@ -52,13 +52,14 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAllUsers() {
         List<User> users = this.userRepo.findAll();
 
-        users.stream().map(user)
+        List<UserDto> userDtos = users.stream().map(user->this.userToDto(user)).collect(Collectors.toList());
+        return userDtos;
     }
 
     @Override
     public void deleteUser(Integer userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteUser'");
+        User user = this.userRepo.findById(userId).orElseThrow(()-> new ResouceNotFoundException("User", "Id", userId));
+        this.userRepo.delete(user);
     }
 
     public  User dtoToUser(UserDto userDto){
