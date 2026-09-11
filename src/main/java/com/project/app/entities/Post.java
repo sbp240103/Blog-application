@@ -13,9 +13,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity 
 @Table (name = "post")
+@NoArgsConstructor 
+@Getter 
+@Setter 
 public class Post {
 
     @Id 
