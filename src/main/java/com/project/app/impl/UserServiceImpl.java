@@ -1,4 +1,4 @@
-package com.project.app.services.impl;
+package com.project.app.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;
