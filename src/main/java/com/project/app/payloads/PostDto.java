@@ -15,11 +15,8 @@ public class PostDto {
 
     private Integer postId;
 
-    @NotEmpty(message = "post title should not be empty")
-    @Size(min = 4, max = 100, message = "post title must be between 4 and 100 characters")
     private String title;
 
-    @NotEmpty(message = "post content should not be empty")
     private String content;
 
     private String imageName;
