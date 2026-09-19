@@ -4,8 +4,11 @@ import java.sql.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.project.app.entities.Category;
@@ -80,8 +83,10 @@ public class PostServiceImpl implements PostService {
 
     // getall
     @Override
-    public List<PostDto> getAllPosts(){
-        List<Post> allPosts = this.postRepo.findAll();
+    public List<PostDto> getAllPosts(Integer pageSize, Integer pageNumber){
+        Pageable p = PageRequest.of(pageNumber, pageSize);
+        Page<Post> pagePost= this.postRepo.findAll(p);
+        List<Post> allPosts = pagePost.getContent();
         return allPosts.stream().map(post->this.modelMapper.map(post, PostDto.class)).collect(Collectors.toList());
     }
 
