@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.app.payloads.PostDto;
+import com.project.app.payloads.PostResponse;
 
 import jakarta.validation.Valid;
 import com.project.app.services.PostService;
@@ -53,11 +54,13 @@ public class PostController {
 
     // get all posts
     @GetMapping ("/posts")
-    public ResponseEntity<List<PostDto>> getAllPosts(
-        @RequestParam (value = "pageNumber", defaultValue = "1", required = false) Integer pageNumber,
-        @RequestParam (value = "pageSize", defaultValue = "10", required = false) Integer pageSize
+    public ResponseEntity<PostResponse> getAllPosts(
+        @RequestParam (value = "pageNumber", defaultValue = "0", required = false) Integer pageNumber,
+        @RequestParam (value = "pageSize", defaultValue = "10", required = false) Integer pageSize,
+        @RequestParam (value = "sortBy", defaultValue = "postId", required = false) String sortBy,
+        @RequestParam (value = "sortDirection", defaultValue = "asc", required = false) String sortDirection,
     ){
-        return ResponseEntity.ok(this.postService.getAllPosts(pageSize, pageNumber));
+        return ResponseEntity.ok(this.postService.getAllPosts(pageSize, pageNumber, sortBy, sortDirection));
     }
 
     // get single post
