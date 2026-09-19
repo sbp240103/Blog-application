@@ -2,6 +2,7 @@ package com.project.app.impl;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -127,11 +128,9 @@ public class PostServiceImpl implements PostService {
     // search
     @Override
     public List<PostDto> searchPosts(String keyword){
-        List<Post> posts = this.postRepo.findAll();
-        return posts.stream()
-                .filter(post-> post.getTitle() != null && post.getTitle().toLowerCase().contains(keyword.toLowerCase()))
-                .map(post->this.modelMapper.map(post, PostDto.class))
-                .collect(Collectors.toList());
+        List<Post> posts = this.postRepo.searchByTitle("%" + keyword + "%");
+        List<PostDto> postDtos= posts.stream().map((post)->this.modelMapper.map(post, PostDto.class)).collect(Collectors.toList());
+        return postDtos;
     }
 
 }
