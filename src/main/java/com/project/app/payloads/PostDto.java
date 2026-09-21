@@ -1,6 +1,10 @@
 package com.project.app.payloads;
 
 import java.sql.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import com.project.app.entities.Comments;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -26,5 +30,7 @@ public class PostDto {
     private CategoryDto category;
 
     private UserDto user;
+
+    private Set<Comments> comments = new HashSet<>();
 
 }
