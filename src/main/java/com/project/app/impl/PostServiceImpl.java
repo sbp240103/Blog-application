@@ -133,8 +133,4 @@ public class PostServiceImpl implements PostService {
         return postDtos;
     }
 
-    // post image upload
-
-    public ResponseE
-
 }
