@@ -1,5 +1,7 @@
 package com.project.app.payloads;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -25,6 +27,7 @@ public class UserDto {
 
     @NotEmpty(message = "password should not be empty")
     @Size(min = 6, max = 15, message = "password must be between 6 and 15 characters")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @NotEmpty(message = "about should not be empty")
