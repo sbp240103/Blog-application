@@ -19,9 +19,16 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/login", "/logout", "/error").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                     .anyRequest().authenticated())
+            .formLogin(form -> form
+                    .defaultSuccessUrl("/api/posts", true)
+                    .permitAll())
+            .logout(logout -> logout
+                    .logoutSuccessUrl("/login?logout")
+                    .permitAll())
             .httpBasic(Customizer.withDefaults());
 
         return http.build();
