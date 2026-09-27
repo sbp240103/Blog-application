@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration 
 @EnableWebSecurity 
+@EnableMethodSecurity 
 public class SecurityConfig {
 
     @Bean 
@@ -22,6 +24,10 @@ public class SecurityConfig {
                     .requestMatchers("/login", "/logout", "/error").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                    .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/api/categories").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
                     .anyRequest().authenticated())
             .formLogin(form -> form
                     .defaultSuccessUrl("/api/posts", true)
