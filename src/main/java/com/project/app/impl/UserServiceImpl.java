@@ -9,6 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.project.app.payloads.UserDto;
+import com.project.app.config.AppConstants;
+import com.project.app.entities.Role;
+import com.project.app.repositories.RoleRepo;
 import com.project.app.repositories.UserRepo;
 import com.project.app.services.UserService;
 import com.project.app.entities.User;
@@ -26,11 +29,19 @@ public class UserServiceImpl implements UserService {
     @Autowired 
     private PasswordEncoder passwordEncoder;
 
+    @Autowired 
+    private RoleRepo roleRepo;
+
     @Override
     public UserDto createUser(UserDto userDto) {
         
         User user = this.dtoToUser(userDto);
         user.setPassword(this.passwordEncoder.encode(userDto.getPassword()));
+
+        Role role = this.roleRepo.findById(AppConstants.NORMAL_USER)
+                .orElseThrow(()-> new ResouceNotFoundException("Role", "Id", AppConstants.NORMAL_USER));
+        user.getRoles().add(role);
+
         User savedUser = this.userRepo.save(user);
 
         return this.userToDto(savedUser);

@@ -1,7 +1,9 @@
 package com.project.app.entities;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.processing.Generated;
 
@@ -12,6 +14,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -40,5 +45,13 @@ public class User {
 
     @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Post> posts = new ArrayList<>();
+
+    @ManyToMany (fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinTable (
+        name = "user_role",
+        joinColumns = @JoinColumn (name = "user_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn (name = "role_id", referencedColumnName = "id")
+    )
+    private Set<Role> roles = new HashSet<>();
 
 }
