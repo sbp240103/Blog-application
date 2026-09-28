@@ -38,7 +38,8 @@ public class JwtTokenHelper {
     }
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-        return claimsResolver.apply(getAllClaimsFromToken(token));
+        return claimsResolver
+        .apply(getAllClaimsFromToken(token));
     }
 
     public String getUsernameFromToken(String token) {
