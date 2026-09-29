@@ -20,18 +20,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.project.app.security.JwtAuthenticationEntryPoint;
 import com.project.app.security.JwtAuthenticationFilter;
 
-@Configuration 
-@EnableWebSecurity 
-@EnableMethodSecurity 
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
-    @Autowired 
+    @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    @Autowired 
+    @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Bean 
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())

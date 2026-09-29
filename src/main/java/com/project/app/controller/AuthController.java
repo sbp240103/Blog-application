@@ -31,7 +31,7 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     // login and hand back a token
-    @PostMapping ("/login")
+    @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> createToken(@RequestBody JwtAuthRequest request) {
 
         this.authenticate(request.getEmail(), request.getPassword());
