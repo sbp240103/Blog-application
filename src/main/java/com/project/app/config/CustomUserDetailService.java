@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 import com.project.app.entities.User;
 import com.project.app.repositories.UserRepo;
 
-@Service 
+@Service
 public class CustomUserDetailService implements UserDetailsService {
 
-    @Autowired 
+    @Autowired
     private UserRepo userRepo;
 
     @Override
