@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 import com.project.app.entities.Role;
 import com.project.app.repositories.RoleRepo;
 
-@Component 
+@Component
 public class RoleSeeder implements CommandLineRunner {
 
-    @Autowired 
+    @Autowired
     private RoleRepo roleRepo;
 
     @Override
