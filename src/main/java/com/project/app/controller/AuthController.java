@@ -15,7 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.project.app.payloads.JwtAuthRequest;
 import com.project.app.payloads.JwtAuthResponse;
+import com.project.app.payloads.UserDto;
 import com.project.app.security.JwtTokenHelper;
+import com.project.app.services.UserService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -30,6 +34,9 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private UserService userService;
+
     // login and hand back a token
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> createToken(@RequestBody JwtAuthRequest request) {
@@ -40,6 +47,13 @@ public class AuthController {
         String token = this.jwtTokenHelper.generateToken(userDetails);
 
         return new ResponseEntity<>(new JwtAuthResponse(token), HttpStatus.OK);
+    }
+
+    // register a new account, every new account gets the normal user role
+    @PostMapping("/register")
+    public ResponseEntity<UserDto> registerUser(@Valid @RequestBody UserDto userDto) {
+        UserDto registeredUser = this.userService.registerNewUser(userDto);
+        return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
     }
 
     private void authenticate(String email, String password) {

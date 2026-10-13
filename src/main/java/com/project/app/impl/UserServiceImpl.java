@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import com.project.app.repositories.RoleRepo;
 import com.project.app.repositories.UserRepo;
 import com.project.app.services.UserService;
 import com.project.app.entities.User;
+import com.project.app.exceptions.ApiException;
 import com.project.app.exceptions.ResouceNotFoundException;
 
 @Service
@@ -33,8 +35,17 @@ public class UserServiceImpl implements UserService {
     private RoleRepo roleRepo;
 
     @Override
+    public UserDto registerNewUser(UserDto userDto) {
+        return this.createUser(userDto);
+    }
+
+    @Override
     public UserDto createUser(UserDto userDto) {
-        
+
+        if (this.userRepo.existsByEmail(userDto.getEmail())) {
+            throw new ApiException("email is already registered : " + userDto.getEmail(), HttpStatus.CONFLICT);
+        }
+
         User user = this.dtoToUser(userDto);
         user.setPassword(this.passwordEncoder.encode(userDto.getPassword()));
 
@@ -51,6 +62,11 @@ public class UserServiceImpl implements UserService {
     public UserDto updateUser(UserDto userDto, Integer userId) {
         User user = this.userRepo.findById(userId)
                 .orElseThrow(() -> new ResouceNotFoundException("User", "Id", userId));
+
+        boolean emailChanged = !user.getEmail().equalsIgnoreCase(userDto.getEmail());
+        if (emailChanged && this.userRepo.existsByEmail(userDto.getEmail())) {
+            throw new ApiException("email is already registered : " + userDto.getEmail(), HttpStatus.CONFLICT);
+        }
 
         user.setName(userDto.getName());
         user.setEmail(userDto.getEmail());
