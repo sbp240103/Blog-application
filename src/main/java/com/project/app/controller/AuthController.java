@@ -1,5 +1,6 @@
 package com.project.app.controller;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +14,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.app.entities.User;
+import com.project.app.exceptions.ResouceNotFoundException;
 import com.project.app.payloads.JwtAuthRequest;
 import com.project.app.payloads.JwtAuthResponse;
 import com.project.app.payloads.UserDto;
+import com.project.app.repositories.UserRepo;
 import com.project.app.security.JwtTokenHelper;
 import com.project.app.services.UserService;
 
@@ -37,16 +41,25 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    // login and hand back a token
+    @Autowired
+    private UserRepo userRepo;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    // login and hand back a token along with the logged in user
     @PostMapping("/login")
-    public ResponseEntity<JwtAuthResponse> createToken(@RequestBody JwtAuthRequest request) {
+    public ResponseEntity<JwtAuthResponse> createToken(@Valid @RequestBody JwtAuthRequest request) {
 
         this.authenticate(request.getEmail(), request.getPassword());
 
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(request.getEmail());
         String token = this.jwtTokenHelper.generateToken(userDetails);
 
-        return new ResponseEntity<>(new JwtAuthResponse(token), HttpStatus.OK);
+        User user = this.userRepo.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ResouceNotFoundException("User", "email", 0));
+
+        return new ResponseEntity<>(new JwtAuthResponse(token, this.modelMapper.map(user, UserDto.class)), HttpStatus.OK);
     }
 
     // register a new account, every new account gets the normal user role
