@@ -1,5 +1,8 @@
 package com.project.app.impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +42,15 @@ public class CommentServiceImpl implements CommentService {
 
         Comments savedComment = this.commentRepo.save(comment);
         return this.modelMapper.map(savedComment, CommentDto.class);
+    }
+
+    // all comments of a post, oldest first
+    @Override
+    public List<CommentDto> getCommentsByPost(Integer postId) {
+        Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "post id", postId));
+        return this.commentRepo.findByPostOrderByIdAsc(post).stream()
+                .map(comment -> this.modelMapper.map(comment, CommentDto.class))
+                .collect(Collectors.toList());
     }
 
     // delete

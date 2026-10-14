@@ -1,9 +1,12 @@
 package com.project.app.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +31,12 @@ public class CommentController {
     public ResponseEntity<CommentDto> createComment(@Valid @RequestBody CommentDto commentDto, @PathVariable("postId") Integer postId) {
         CommentDto createdComment = this.commentService.createComment(commentDto, postId);
         return new ResponseEntity<>(createdComment, HttpStatus.CREATED);
+    }
+
+    // all comments of a post
+    @GetMapping ("/post/{postId}/comments")
+    public ResponseEntity<List<CommentDto>> getCommentsByPost(@PathVariable("postId") Integer postId) {
+        return ResponseEntity.ok(this.commentService.getCommentsByPost(postId));
     }
 
     // delete comment
