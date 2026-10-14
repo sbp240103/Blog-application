@@ -5,10 +5,12 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.project.app.entities.Comments;
 import com.project.app.entities.Post;
+import com.project.app.entities.User;
 import com.project.app.exceptions.ResouceNotFoundException;
 import com.project.app.payloads.CommentDto;
 import com.project.app.repositories.CommentRepo;
@@ -42,6 +44,21 @@ public class CommentServiceImpl implements CommentService {
 
         Comments savedComment = this.commentRepo.save(comment);
         return this.modelMapper.map(savedComment, CommentDto.class);
+    }
+
+    // only the author can edit a comment
+    @Override
+    public CommentDto updateComment(CommentDto commentDto, Integer commentId) {
+        Comments comment = this.commentRepo.findById(commentId).orElseThrow(()-> new ResouceNotFoundException("Comment", "comment id", commentId));
+
+        User loggedInUser = this.authUtil.getLoggedInUser();
+        if (comment.getUser() == null || comment.getUser().getId() != loggedInUser.getId()) {
+            throw new AccessDeniedException("only the author can edit this comment");
+        }
+
+        comment.setContent(commentDto.getContent());
+        Comments updatedComment = this.commentRepo.save(comment);
+        return this.modelMapper.map(updatedComment, CommentDto.class);
     }
 
     // all comments of a post, oldest first

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +38,12 @@ public class CommentController {
     @GetMapping ("/post/{postId}/comments")
     public ResponseEntity<List<CommentDto>> getCommentsByPost(@PathVariable("postId") Integer postId) {
         return ResponseEntity.ok(this.commentService.getCommentsByPost(postId));
+    }
+
+    // update comment
+    @PutMapping ("/comments/{commentId}")
+    public ResponseEntity<CommentDto> updateComment(@Valid @RequestBody CommentDto commentDto, @PathVariable("commentId") Integer commentId) {
+        return ResponseEntity.ok(this.commentService.updateComment(commentDto, commentId));
     }
 
     // delete comment
