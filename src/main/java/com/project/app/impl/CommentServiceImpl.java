@@ -10,6 +10,7 @@ import com.project.app.exceptions.ResouceNotFoundException;
 import com.project.app.payloads.CommentDto;
 import com.project.app.repositories.CommentRepo;
 import com.project.app.repositories.PostRepo;
+import com.project.app.security.AuthUtil;
 import com.project.app.services.CommentService;
 
 @Service 
@@ -21,8 +22,11 @@ public class CommentServiceImpl implements CommentService {
     @Autowired 
     private CommentRepo commentRepo;
 
-    @Autowired 
+    @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private AuthUtil authUtil;
 
     // create
     @Override
@@ -31,6 +35,7 @@ public class CommentServiceImpl implements CommentService {
 
         Comments comment = this.modelMapper.map(commentDto, Comments.class);
         comment.setPost(post);
+        comment.setUser(this.authUtil.getLoggedInUser());
 
         Comments savedComment = this.commentRepo.save(comment);
         return this.modelMapper.map(savedComment, CommentDto.class);
