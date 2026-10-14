@@ -57,6 +57,12 @@ public class UserController {
         return ResponseEntity.ok(this.userService.getAllUsers());
     }
 
+    // currently logged in user
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> getCurrentUser(){
+        return ResponseEntity.ok(this.userService.getCurrentUser());
+    }
+
     @GetMapping("/{userId}")
     public ResponseEntity<UserDto> getUserById(@PathVariable("userId") Integer uId){
         return ResponseEntity.ok(this.userService.getUserById(uId));

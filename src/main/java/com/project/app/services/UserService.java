@@ -10,6 +10,7 @@ public interface UserService {
     UserDto createUser(UserDto user);
     UserDto updateUser(UserDto user, Integer userId);
     UserDto getUserById(Integer userId);
+    UserDto getCurrentUser();
     List<UserDto> getAllUsers();
     void deleteUser(Integer userId);
 }
