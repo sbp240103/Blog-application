@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,6 +73,12 @@ public class UserServiceImpl implements UserService {
     public UserDto updateUser(UserDto userDto, Integer userId) {
         User user = this.userRepo.findById(userId)
                 .orElseThrow(() -> new ResouceNotFoundException("User", "Id", userId));
+
+        // users can only edit their own account, admins can edit anyone
+        User loggedInUser = this.authUtil.getLoggedInUser();
+        if (loggedInUser.getId() != user.getId() && !this.authUtil.isAdmin()) {
+            throw new AccessDeniedException("you can only update your own account");
+        }
 
         boolean emailChanged = !user.getEmail().equalsIgnoreCase(userDto.getEmail());
         if (emailChanged && this.userRepo.existsByEmail(userDto.getEmail())) {

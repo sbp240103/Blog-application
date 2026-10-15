@@ -50,6 +50,12 @@ public class PostServiceImpl implements PostService {
         User user = this.userRepo.findById(userId).orElseThrow(()-> new ResouceNotFoundException("User", "Id", userId));
         Category category = this.categoryRepo.findById(categoryId).orElseThrow(()-> new ResouceNotFoundException("Category", "Id", categoryId));
 
+        // nobody can publish a post in somebody else's name, except an admin
+        User loggedInUser = this.authUtil.getLoggedInUser();
+        if (loggedInUser.getId() != user.getId() && !this.authUtil.isAdmin()) {
+            throw new AccessDeniedException("you can only create posts for your own account");
+        }
+
         Post post = this.modelMapper.map(postDto, Post.class);
         post.setPostId(null);
         post.setImageName(postDto.getImageName() == null ? "default.png" : postDto.getImageName());
