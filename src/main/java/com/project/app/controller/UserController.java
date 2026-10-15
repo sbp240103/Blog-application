@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.app.payloads.ChangePasswordRequest;
 import com.project.app.payloads.UserDto;
 
 import jakarta.validation.Valid;
@@ -61,6 +62,13 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(){
         return ResponseEntity.ok(this.userService.getCurrentUser());
+    }
+
+    // change password of the logged in user
+    @PutMapping("/me/password")
+    public ResponseEntity<ApiResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request){
+        this.userService.changePassword(request);
+        return ResponseEntity.ok(new ApiResponse("password changed successfully", true));
     }
 
     @GetMapping("/{userId}")

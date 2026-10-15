@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.project.app.payloads.ChangePasswordRequest;
 import com.project.app.payloads.UserDto;
 import com.project.app.config.AppConstants;
 import com.project.app.entities.Role;
@@ -96,6 +97,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getCurrentUser() {
         return this.userToDto(this.authUtil.getLoggedInUser());
+    }
+
+    @Override
+    public void changePassword(ChangePasswordRequest request) {
+        User user = this.authUtil.getLoggedInUser();
+
+        if (!this.passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new ApiException("old password is incorrect");
+        }
+        if (request.getOldPassword().equals(request.getNewPassword())) {
+            throw new ApiException("new password must be different from the old password");
+        }
+
+        user.setPassword(this.passwordEncoder.encode(request.getNewPassword()));
+        this.userRepo.save(user);
     }
 
     @Override
