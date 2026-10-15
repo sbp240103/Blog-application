@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.project.app.entities.Category;
@@ -21,6 +22,7 @@ import com.project.app.repositories.PostRepo;
 import com.project.app.repositories.UserRepo;
 import com.project.app.payloads.PostDto;
 import com.project.app.payloads.PostResponse;
+import com.project.app.security.AuthUtil;
 import com.project.app.services.PostService;
 import com.project.app.exceptions.ResouceNotFoundException;
 
@@ -36,8 +38,11 @@ public class PostServiceImpl implements PostService {
     @Autowired 
     private CategoryRepo categoryRepo;
 
-    @Autowired 
+    @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private AuthUtil authUtil;
 
     // create
     @Override
@@ -60,6 +65,8 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDto updatePost(PostDto postDto, Integer postId){
         Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
+        this.checkOwnerOrAdmin(post);
+
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         if (postDto.getImageName() != null) {
@@ -74,7 +81,17 @@ public class PostServiceImpl implements PostService {
     @Override
     public void deletePost(Integer postId){
         Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
+        this.checkOwnerOrAdmin(post);
         this.postRepo.delete(post);
+    }
+
+    // a post can only be changed by the user who wrote it or by an admin
+    private void checkOwnerOrAdmin(Post post) {
+        User loggedInUser = this.authUtil.getLoggedInUser();
+        boolean isOwner = post.getUser() != null && post.getUser().getId() == loggedInUser.getId();
+        if (!isOwner && !this.authUtil.isAdmin()) {
+            throw new AccessDeniedException("you can only modify your own posts");
+        }
     }
 
     // get 
