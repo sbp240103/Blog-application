@@ -74,6 +74,15 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void deleteComment(Integer commentId) {
         Comments comment = this.commentRepo.findById(commentId).orElseThrow(()-> new ResouceNotFoundException("Comment", "comment id", commentId));
+
+        // the author, the owner of the post or an admin can remove a comment
+        User loggedInUser = this.authUtil.getLoggedInUser();
+        boolean isAuthor = comment.getUser() != null && comment.getUser().getId() == loggedInUser.getId();
+        boolean isPostOwner = comment.getPost().getUser() != null && comment.getPost().getUser().getId() == loggedInUser.getId();
+        if (!isAuthor && !isPostOwner && !this.authUtil.isAdmin()) {
+            throw new AccessDeniedException("you can not delete this comment");
+        }
+
         this.commentRepo.delete(comment);
     }
 
