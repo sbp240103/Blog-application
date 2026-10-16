@@ -87,14 +87,26 @@ public class PostController {
 
     // get posts by user
     @GetMapping("/user/{userId}/posts")
-    public ResponseEntity<List<PostDto>> getPostsByUser(@PathVariable("userId") Integer userId){
-        return ResponseEntity.ok(this.postService.getPostsByUser(userId));
+    public ResponseEntity<PageResponse<PostDto>> getPostsByUser(
+        @PathVariable("userId") Integer userId,
+        @RequestParam (value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+        @RequestParam (value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+        @RequestParam (value = "sortBy", defaultValue = "postId", required = false) String sortBy,
+        @RequestParam (value = "sortDirection", defaultValue = AppConstants.SORT_DIRECTION, required = false) String sortDirection
+    ){
+        return ResponseEntity.ok(this.postService.getPostsByUser(userId, pageNumber, pageSize, sortBy, sortDirection));
     }
 
     // get posts by category
     @GetMapping("/category/{categoryId}/posts")
-    public ResponseEntity<List<PostDto>> getPostsByCategory(@PathVariable("categoryId") Integer categoryId){
-        return ResponseEntity.ok(this.postService.getPostsByCategory(categoryId));
+    public ResponseEntity<PageResponse<PostDto>> getPostsByCategory(
+        @PathVariable("categoryId") Integer categoryId,
+        @RequestParam (value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+        @RequestParam (value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+        @RequestParam (value = "sortBy", defaultValue = "postId", required = false) String sortBy,
+        @RequestParam (value = "sortDirection", defaultValue = AppConstants.SORT_DIRECTION, required = false) String sortDirection
+    ){
+        return ResponseEntity.ok(this.postService.getPostsByCategory(categoryId, pageNumber, pageSize, sortBy, sortDirection));
     }
 
     // search posts
