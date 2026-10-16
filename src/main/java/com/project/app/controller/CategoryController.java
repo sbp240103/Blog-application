@@ -1,7 +1,5 @@
 package com.project.app.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,9 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.app.config.AppConstants;
 import com.project.app.payloads.CategoryDto;
+import com.project.app.payloads.PageResponse;
 
 import jakarta.validation.Valid;
 import com.project.app.services.CategoryService;
@@ -52,8 +53,13 @@ public class CategoryController {
 
     // get category
     @GetMapping
-    public ResponseEntity<List<CategoryDto>> getAllCategory(){
-        return ResponseEntity.ok(this.categoryService.getAllCategory());
+    public ResponseEntity<PageResponse<CategoryDto>> getAllCategory(
+        @RequestParam (value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+        @RequestParam (value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+        @RequestParam (value = "sortBy", defaultValue = "categoryId", required = false) String sortBy,
+        @RequestParam (value = "sortDirection", defaultValue = AppConstants.SORT_DIRECTION, required = false) String sortDirection
+    ){
+        return ResponseEntity.ok(this.categoryService.getAllCategory(pageNumber, pageSize, sortBy, sortDirection));
     }
 
     @GetMapping("/{categoryId}")

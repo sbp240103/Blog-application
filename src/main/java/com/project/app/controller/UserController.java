@@ -1,8 +1,5 @@
 package com.project.app.controller;
 
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.app.config.AppConstants;
 import com.project.app.payloads.ChangePasswordRequest;
+import com.project.app.payloads.PageResponse;
 import com.project.app.payloads.UserDto;
 
 import jakarta.validation.Valid;
@@ -54,8 +54,13 @@ public class UserController {
 
     // get user
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers(){
-        return ResponseEntity.ok(this.userService.getAllUsers());
+    public ResponseEntity<PageResponse<UserDto>> getAllUsers(
+        @RequestParam (value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+        @RequestParam (value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+        @RequestParam (value = "sortBy", defaultValue = "id", required = false) String sortBy,
+        @RequestParam (value = "sortDirection", defaultValue = AppConstants.SORT_DIRECTION, required = false) String sortDirection
+    ){
+        return ResponseEntity.ok(this.userService.getAllUsers(pageNumber, pageSize, sortBy, sortDirection));
     }
 
     // currently logged in user

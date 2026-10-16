@@ -1,10 +1,8 @@
 package com.project.app.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,7 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.project.app.payloads.ChangePasswordRequest;
+import com.project.app.payloads.PageResponse;
 import com.project.app.payloads.UserDto;
+import com.project.app.utils.PageUtil;
 import com.project.app.config.AppConstants;
 import com.project.app.entities.Role;
 import com.project.app.repositories.CommentRepo;
@@ -122,11 +122,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getAllUsers() {
-        List<User> users = this.userRepo.findAll();
-
-        List<UserDto> userDtos = users.stream().map(user->this.userToDto(user)).collect(Collectors.toList());
-        return userDtos;
+    public PageResponse<UserDto> getAllUsers(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection) {
+        Page<User> page = this.userRepo.findAll(PageUtil.build(pageNumber, pageSize, sortBy, sortDirection));
+        return PageResponse.of(page, this::userToDto);
     }
 
     @Override

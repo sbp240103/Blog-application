@@ -1,15 +1,15 @@
 package com.project.app.impl;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.project.app.entities.Category;
 import com.project.app.repositories.CategoryRepo;
+import com.project.app.utils.PageUtil;
 import com.project.app.payloads.CategoryDto;
+import com.project.app.payloads.PageResponse;
 import com.project.app.services.CategoryService;
 import com.project.app.exceptions.ResouceNotFoundException;
 
@@ -59,10 +59,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     // getall
     @Override
-    public List<CategoryDto> getAllCategory(){
-        List<Category> allCategories = this.categoryRepo.findAll();
-        List<CategoryDto> allCategoryDtos = allCategories.stream().map(category->this.modelMapper.map(category, CategoryDto.class)).collect(Collectors.toList());
-        return allCategoryDtos;
+    public PageResponse<CategoryDto> getAllCategory(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection){
+        Page<Category> page = this.categoryRepo.findAll(PageUtil.build(pageNumber, pageSize, sortBy, sortDirection));
+        return PageResponse.of(page, category -> this.modelMapper.map(category, CategoryDto.class));
     }
 
     

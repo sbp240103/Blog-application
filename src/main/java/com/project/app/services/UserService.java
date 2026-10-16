@@ -1,8 +1,7 @@
 package com.project.app.services;
 
-import java.util.List;
-
 import com.project.app.payloads.ChangePasswordRequest;
+import com.project.app.payloads.PageResponse;
 import com.project.app.payloads.UserDto;
 
 public interface UserService {
@@ -13,6 +12,6 @@ public interface UserService {
     UserDto getUserById(Integer userId);
     UserDto getCurrentUser();
     void changePassword(ChangePasswordRequest request);
-    List<UserDto> getAllUsers();
+    PageResponse<UserDto> getAllUsers(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection);
     void deleteUser(Integer userId);
 }

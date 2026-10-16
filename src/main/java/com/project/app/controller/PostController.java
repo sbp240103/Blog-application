@@ -21,8 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.project.app.config.AppConstants;
+import com.project.app.payloads.PageResponse;
 import com.project.app.payloads.PostDto;
-import com.project.app.payloads.PostResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -69,13 +70,13 @@ public class PostController {
 
     // get all posts
     @GetMapping ("/posts")
-    public ResponseEntity<PostResponse> getAllPosts(
-        @RequestParam (value = "pageNumber", defaultValue = "0", required = false) Integer pageNumber,
-        @RequestParam (value = "pageSize", defaultValue = "10", required = false) Integer pageSize,
+    public ResponseEntity<PageResponse<PostDto>> getAllPosts(
+        @RequestParam (value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+        @RequestParam (value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
         @RequestParam (value = "sortBy", defaultValue = "postId", required = false) String sortBy,
-        @RequestParam (value = "sortDirection", defaultValue = "asc", required = false) String sortDirection
+        @RequestParam (value = "sortDirection", defaultValue = AppConstants.SORT_DIRECTION, required = false) String sortDirection
     ){
-        return ResponseEntity.ok(this.postService.getAllPosts(pageSize, pageNumber, sortBy, sortDirection));
+        return ResponseEntity.ok(this.postService.getAllPosts(pageNumber, pageSize, sortBy, sortDirection));
     }
 
     // get single post
