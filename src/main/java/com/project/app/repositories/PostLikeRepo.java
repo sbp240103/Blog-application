@@ -2,6 +2,8 @@ package com.project.app.repositories;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.project.app.entities.Post;
@@ -15,6 +17,8 @@ public interface PostLikeRepo extends JpaRepository<PostLike, Integer> {
     Optional<PostLike> findByUserAndPost(User user, Post post);
 
     long countByPost(Post post);
+
+    Page<PostLike> findByPost(Post post, Pageable pageable);
 
     void deleteByUser(User user);
 
