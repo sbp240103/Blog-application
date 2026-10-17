@@ -20,6 +20,7 @@ import com.project.app.payloads.PostDto;
 import com.project.app.payloads.PageResponse;
 import com.project.app.security.AuthUtil;
 import com.project.app.utils.PageUtil;
+import com.project.app.utils.PostMapper;
 import com.project.app.services.PostService;
 import com.project.app.exceptions.ResouceNotFoundException;
 
@@ -41,6 +42,9 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private AuthUtil authUtil;
 
+    @Autowired
+    private PostMapper postMapper;
+
     // create
     @Override
     public PostDto createPost(PostDto postDto, Integer userId, Integer categoryId){
@@ -61,7 +65,7 @@ public class PostServiceImpl implements PostService {
         post.setCategory(category);
 
         Post savedPost = this.postRepo.save(post);
-        return this.modelMapper.map(savedPost, PostDto.class);
+        return this.postMapper.toDto(savedPost);
     }
 
     // update
@@ -77,7 +81,7 @@ public class PostServiceImpl implements PostService {
         }
 
         Post updatedPost = this.postRepo.save(post);
-        return this.modelMapper.map(updatedPost, PostDto.class);
+        return this.postMapper.toDto(updatedPost);
     }
 
     // delete
@@ -101,14 +105,14 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDto getPostById(Integer postId){
         Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
-        return this.modelMapper.map(post, PostDto.class);
+        return this.postMapper.toDto(post);
     }
 
     // getall
     @Override
     public PageResponse<PostDto> getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection){
         Page<Post> pagePost = this.postRepo.findAll(PageUtil.build(pageNumber, pageSize, sortBy, sortDirection));
-        return PageResponse.of(pagePost, post -> this.modelMapper.map(post, PostDto.class));
+        return PageResponse.of(pagePost, this.postMapper::toDto);
     }
 
     // get by user
@@ -116,7 +120,7 @@ public class PostServiceImpl implements PostService {
     public PageResponse<PostDto> getPostsByUser(Integer userId, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection){
         User user = this.userRepo.findById(userId).orElseThrow(()-> new ResouceNotFoundException("User", "Id", userId));
         Page<Post> posts = this.postRepo.findByUser(user, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection));
-        return PageResponse.of(posts, post -> this.modelMapper.map(post, PostDto.class));
+        return PageResponse.of(posts, this.postMapper::toDto);
     }
 
     // get by category
@@ -124,14 +128,14 @@ public class PostServiceImpl implements PostService {
     public PageResponse<PostDto> getPostsByCategory(Integer categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection){
         Category category = this.categoryRepo.findById(categoryId).orElseThrow(()-> new ResouceNotFoundException("Category", "Id", categoryId));
         Page<Post> posts = this.postRepo.findByCategory(category, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection));
-        return PageResponse.of(posts, post -> this.modelMapper.map(post, PostDto.class));
+        return PageResponse.of(posts, this.postMapper::toDto);
     }
 
     // search
     @Override
     public List<PostDto> searchPosts(String keyword){
         List<Post> posts = this.postRepo.searchByTitle("%" + keyword + "%");
-        List<PostDto> postDtos= posts.stream().map((post)->this.modelMapper.map(post, PostDto.class)).collect(Collectors.toList());
+        List<PostDto> postDtos= posts.stream().map(this.postMapper::toDto).collect(Collectors.toList());
         return postDtos;
     }
 

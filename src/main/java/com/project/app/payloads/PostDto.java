@@ -4,6 +4,8 @@ import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -34,5 +36,9 @@ public class PostDto {
     private UserDto user;
 
     private Set<CommentDto> comments = new HashSet<>();
+
+    // computed on the server, ignored when sent by a client
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private long likeCount;
 
 }
