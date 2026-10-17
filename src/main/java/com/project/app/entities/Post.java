@@ -53,4 +53,8 @@ public class Post {
     @OneToMany (mappedBy = "post", cascade = CascadeType.ALL)
     private Set<Comments> comments = new HashSet<>();
 
+    // likes are removed together with the post
+    @OneToMany (mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PostLike> likes = new HashSet<>();
+
 }
