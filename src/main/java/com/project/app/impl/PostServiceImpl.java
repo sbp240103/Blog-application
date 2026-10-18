@@ -1,7 +1,9 @@
 package com.project.app.impl;
 
 import java.sql.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -12,9 +14,12 @@ import org.springframework.stereotype.Service;
 
 import com.project.app.entities.Category;
 import com.project.app.entities.Post;
+import com.project.app.entities.Tag;
 import com.project.app.entities.User;
+import com.project.app.exceptions.ApiException;
 import com.project.app.repositories.CategoryRepo;
 import com.project.app.repositories.PostRepo;
+import com.project.app.repositories.TagRepo;
 import com.project.app.repositories.UserRepo;
 import com.project.app.payloads.PostDto;
 import com.project.app.payloads.PageResponse;
@@ -45,6 +50,9 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private PostMapper postMapper;
 
+    @Autowired
+    private TagRepo tagRepo;
+
     // create
     @Override
     public PostDto createPost(PostDto postDto, Integer userId, Integer categoryId){
@@ -63,6 +71,7 @@ public class PostServiceImpl implements PostService {
         post.setAddDate(new Date(System.currentTimeMillis()));
         post.setUser(user);
         post.setCategory(category);
+        post.setTags(this.resolveTags(postDto.getTagNames()));
 
         Post savedPost = this.postRepo.save(post);
         return this.postMapper.toDto(savedPost);
@@ -79,6 +88,9 @@ public class PostServiceImpl implements PostService {
         if (postDto.getImageName() != null) {
             post.setImageName(postDto.getImageName());
         }
+        if (postDto.getTagNames() != null) {
+            post.setTags(this.resolveTags(postDto.getTagNames()));
+        }
 
         Post updatedPost = this.postRepo.save(post);
         return this.postMapper.toDto(updatedPost);
@@ -90,6 +102,25 @@ public class PostServiceImpl implements PostService {
         Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
         this.checkOwnerOrAdmin(post);
         this.postRepo.delete(post);
+    }
+
+    // turns tag names into tag entities, reusing existing tags and creating new ones
+    private Set<Tag> resolveTags(Set<String> tagNames) {
+        Set<Tag> tags = new HashSet<>();
+        if (tagNames == null) {
+            return tags;
+        }
+        for (String rawName : tagNames) {
+            if (rawName == null || rawName.isBlank()) {
+                continue;
+            }
+            String name = rawName.trim().toLowerCase();
+            if (name.length() > 30) {
+                throw new ApiException("tag name can be at most 30 characters : " + name);
+            }
+            tags.add(this.tagRepo.findByName(name).orElseGet(() -> this.tagRepo.save(new Tag(name))));
+        }
+        return tags;
     }
 
     // a post can only be changed by the user who wrote it or by an admin

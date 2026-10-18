@@ -15,6 +15,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -52,6 +54,14 @@ public class Post {
 
     @OneToMany (mappedBy = "post", cascade = CascadeType.ALL)
     private Set<Comments> comments = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable (
+        name = "post_tags",
+        joinColumns = @JoinColumn (name = "post_id"),
+        inverseJoinColumns = @JoinColumn (name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
 
     // likes are removed together with the post
     @OneToMany (mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)

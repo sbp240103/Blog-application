@@ -37,6 +37,11 @@ public class PostDto {
 
     private Set<CommentDto> comments = new HashSet<>();
 
+    // e.g. ["java", "spring"], tags are created on first use.
+    // left out on update means keep the current tags, an empty list removes them
+    @Size(max = 10, message = "a post can have at most 10 tags")
+    private Set<String> tagNames;
+
     // computed on the server, ignored when sent by a client
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private long likeCount;

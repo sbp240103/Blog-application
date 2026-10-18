@@ -1,10 +1,14 @@
 package com.project.app.utils;
 
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.project.app.entities.Post;
+import com.project.app.entities.Tag;
 import com.project.app.payloads.PostDto;
 import com.project.app.repositories.PostLikeRepo;
 
@@ -22,6 +26,7 @@ public class PostMapper {
     public PostDto toDto(Post post) {
         PostDto postDto = this.modelMapper.map(post, PostDto.class);
         postDto.setLikeCount(this.postLikeRepo.countByPost(post));
+        postDto.setTagNames(post.getTags().stream().map(Tag::getName).collect(Collectors.toCollection(TreeSet::new)));
         return postDto;
     }
 }
