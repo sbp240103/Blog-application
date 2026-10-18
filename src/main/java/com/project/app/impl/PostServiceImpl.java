@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -159,6 +160,17 @@ public class PostServiceImpl implements PostService {
     public PageResponse<PostDto> getPostsByCategory(Integer categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection){
         Category category = this.categoryRepo.findById(categoryId).orElseThrow(()-> new ResouceNotFoundException("Category", "Id", categoryId));
         Page<Post> posts = this.postRepo.findByCategory(category, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection));
+        return PageResponse.of(posts, this.postMapper::toDto);
+    }
+
+    // get by tag, tag names are stored in lower case
+    @Override
+    public PageResponse<PostDto> getPostsByTag(String tagName, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection){
+        String name = tagName.trim().toLowerCase();
+        if (this.tagRepo.findByName(name).isEmpty()) {
+            throw new ApiException("tag not found : " + name, HttpStatus.NOT_FOUND);
+        }
+        Page<Post> posts = this.postRepo.findByTagsName(name, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection));
         return PageResponse.of(posts, this.postMapper::toDto);
     }
 
