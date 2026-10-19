@@ -46,4 +46,7 @@ public class PostDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private long likeCount;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Integer viewCount;
+
 }

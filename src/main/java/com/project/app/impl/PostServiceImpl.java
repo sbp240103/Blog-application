@@ -68,6 +68,7 @@ public class PostServiceImpl implements PostService {
 
         Post post = this.modelMapper.map(postDto, Post.class);
         post.setPostId(null);
+        post.setViewCount(0);
         post.setImageName(postDto.getImageName() == null ? "default.png" : postDto.getImageName());
         post.setAddDate(new Date(System.currentTimeMillis()));
         post.setUser(user);
@@ -137,6 +138,11 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDto getPostById(Integer postId){
         Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
+
+        // every read of a single post counts as one view
+        this.postRepo.incrementViewCount(postId);
+        post.setViewCount(post.getViewCount() + 1);
+
         return this.postMapper.toDto(post);
     }
 

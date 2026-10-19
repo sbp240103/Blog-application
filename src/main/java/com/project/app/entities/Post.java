@@ -45,6 +45,10 @@ public class Post {
 
     private Date addDate;
 
+    // how many times the post was opened, defaults to 0 for existing rows
+    @Column (nullable = false, columnDefinition = "int default 0")
+    private Integer viewCount = 0;
+
     @ManyToOne 
     @JoinColumn (name = "category_id")
     private Category category;
