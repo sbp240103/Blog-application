@@ -40,6 +40,7 @@ public class SecurityConfig {
                     .requestMatchers("/api/v1/auth/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                     .requestMatchers("/api/users/me", "/api/users/me/**").authenticated()
+                    .requestMatchers("/api/bookmarks").authenticated()
                     .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                     .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.POST, "/api/categories").hasRole("ADMIN")
