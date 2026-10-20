@@ -14,6 +14,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.project.app.payloads.ApiResponse;
 
@@ -61,6 +62,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PropertyReferenceException.class)
     public ResponseEntity<ApiResponse> invalidPropertyExceptionHandler(PropertyReferenceException ex) {
         return new ResponseEntity<>(new ApiResponse("invalid sort field : " + ex.getPropertyName(), false), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponse> maxUploadSizeExceptionHandler(MaxUploadSizeExceededException ex) {
+        return new ResponseEntity<>(new ApiResponse("uploaded file is too large", false), HttpStatus.CONTENT_TOO_LARGE);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
