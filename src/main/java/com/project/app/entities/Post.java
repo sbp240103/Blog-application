@@ -71,4 +71,8 @@ public class Post {
     @OneToMany (mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostLike> likes = new HashSet<>();
 
+    // bookmarks of a deleted post go away with it
+    @OneToMany (mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Bookmark> bookmarks = new HashSet<>();
+
 }

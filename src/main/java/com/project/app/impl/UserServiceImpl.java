@@ -15,6 +15,7 @@ import com.project.app.payloads.UserDto;
 import com.project.app.utils.PageUtil;
 import com.project.app.config.AppConstants;
 import com.project.app.entities.Role;
+import com.project.app.repositories.BookmarkRepo;
 import com.project.app.repositories.CommentRepo;
 import com.project.app.repositories.PostLikeRepo;
 import com.project.app.repositories.RoleRepo;
@@ -48,6 +49,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PostLikeRepo postLikeRepo;
+
+    @Autowired
+    private BookmarkRepo bookmarkRepo;
 
     @Override
     public UserDto registerNewUser(UserDto userDto) {
@@ -139,6 +143,7 @@ public class UserServiceImpl implements UserService {
         // remove what this user wrote on other people's posts, own posts go with the user
         this.commentRepo.deleteByUser(user);
         this.postLikeRepo.deleteByUser(user);
+        this.bookmarkRepo.deleteByUser(user);
 
         this.userRepo.delete(user);
     }
