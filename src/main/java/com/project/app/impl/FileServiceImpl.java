@@ -54,6 +54,10 @@ public class FileServiceImpl implements FileService{
 
 	@Override
 	public InputStream getResource(String path, String fileName) throws FileNotFoundException {
+        // only plain file names, never paths like ../../something
+        if (fileName == null || !fileName.matches("[A-Za-z0-9._-]+") || fileName.contains("..")) {
+            throw new ApiException("invalid image name");
+        }
         String fullPath = path + File.separator + fileName;
         InputStream is = new FileInputStream(fullPath);
         return is;

@@ -130,13 +130,15 @@ public class PostController {
     }
     
     // serve files
-    @GetMapping (value = "/post/image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @GetMapping ("/post/image/{imageName}")
     public void downloadImage(
         @PathVariable ("imageName") String imageName,
         HttpServletResponse response
     ) throws IOException{
-        InputStream resource = this.fileService.getResource(path, imageName);
-        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-        StreamUtils.copy(resource, response.getOutputStream());
+        try (InputStream resource = this.fileService.getResource(path, imageName)) {
+            boolean isPng = imageName.toLowerCase().endsWith(".png");
+            response.setContentType(isPng ? MediaType.IMAGE_PNG_VALUE : MediaType.IMAGE_JPEG_VALUE);
+            StreamUtils.copy(resource, response.getOutputStream());
+        }
     }
 }

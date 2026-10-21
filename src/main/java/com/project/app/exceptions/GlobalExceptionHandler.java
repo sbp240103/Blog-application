@@ -1,5 +1,6 @@
 package com.project.app.exceptions;
 
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,6 +63,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PropertyReferenceException.class)
     public ResponseEntity<ApiResponse> invalidPropertyExceptionHandler(PropertyReferenceException ex) {
         return new ResponseEntity<>(new ApiResponse("invalid sort field : " + ex.getPropertyName(), false), HttpStatus.BAD_REQUEST);
+    }
+
+    // requested image does not exist on disk
+    @ExceptionHandler(FileNotFoundException.class)
+    public ResponseEntity<ApiResponse> fileNotFoundExceptionHandler(FileNotFoundException ex) {
+        return new ResponseEntity<>(new ApiResponse("file not found", false), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
