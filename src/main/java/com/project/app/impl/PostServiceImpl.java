@@ -1,5 +1,6 @@
 package com.project.app.impl;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -9,9 +10,11 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.project.app.entities.Category;
 import com.project.app.entities.Post;
@@ -27,6 +30,7 @@ import com.project.app.payloads.PageResponse;
 import com.project.app.security.AuthUtil;
 import com.project.app.utils.PageUtil;
 import com.project.app.utils.PostMapper;
+import com.project.app.services.FileService;
 import com.project.app.services.PostService;
 import com.project.app.exceptions.ResouceNotFoundException;
 
@@ -53,6 +57,12 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private TagRepo tagRepo;
+
+    @Autowired
+    private FileService fileService;
+
+    @Value("${project.image}")
+    private String imagePath;
 
     // create
     @Override
@@ -103,7 +113,24 @@ public class PostServiceImpl implements PostService {
     public void deletePost(Integer postId){
         Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
         this.checkOwnerOrAdmin(post);
+        String imageName = post.getImageName();
         this.postRepo.delete(post);
+        this.fileService.deleteImage(this.imagePath, imageName);
+    }
+
+    // ownership is checked before the file is written so rejected uploads leave nothing behind
+    @Override
+    public PostDto uploadPostImage(Integer postId, MultipartFile image) throws IOException {
+        Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
+        this.checkOwnerOrAdmin(post);
+
+        String oldImageName = post.getImageName();
+        String newImageName = this.fileService.uploadImage(this.imagePath, image);
+        post.setImageName(newImageName);
+        Post updatedPost = this.postRepo.save(post);
+
+        this.fileService.deleteImage(this.imagePath, oldImageName);
+        return this.postMapper.toDto(updatedPost);
     }
 
     // turns tag names into tag entities, reusing existing tags and creating new ones

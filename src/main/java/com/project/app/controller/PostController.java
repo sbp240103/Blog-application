@@ -121,12 +121,7 @@ public class PostController {
         @RequestParam ("image") MultipartFile image,
         @PathVariable Integer postId
     ) throws IOException {
-
-        String fileName = this.fileService.uploadImage(path, image);
-        PostDto postDto = this.postService.getPostById(postId);
-        postDto.setImageName(fileName);  
-        PostDto updatePost = this.postService.updatePost(postDto, postId);
-        return new ResponseEntity<PostDto>(updatePost,HttpStatus.OK);
+        return ResponseEntity.ok(this.postService.uploadPostImage(postId, image));
     }
     
     // serve files

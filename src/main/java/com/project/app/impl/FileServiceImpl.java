@@ -19,6 +19,7 @@ import com.project.app.services.FileService;
 @Service
 public class FileServiceImpl implements FileService{
 
+    public static final String DEFAULT_IMAGE = "default.png";
     private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024;
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png");
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of("image/jpeg", "image/png");
@@ -61,6 +62,20 @@ public class FileServiceImpl implements FileService{
         String fullPath = path + File.separator + fileName;
         InputStream is = new FileInputStream(fullPath);
         return is;
+    }
+
+    // removes an uploaded image, the shared default image is never deleted
+    @Override
+    public void deleteImage(String path, String fileName) {
+        if (fileName == null || fileName.isBlank() || DEFAULT_IMAGE.equals(fileName)
+                || !fileName.matches("[A-Za-z0-9._-]+") || fileName.contains("..")) {
+            return;
+        }
+        try {
+            Files.deleteIfExists(Paths.get(path, fileName));
+        } catch (IOException e) {
+            // a leftover file is harmless, the post itself is already updated
+        }
     }
 
     // only reasonably sized jpg and png images are accepted
