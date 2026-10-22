@@ -207,6 +207,14 @@ public class PostServiceImpl implements PostService {
         return PageResponse.of(posts, this.postMapper::toDto);
     }
 
+    // newest posts from the people the logged in user follows
+    @Override
+    public PageResponse<PostDto> getFeed(Integer pageNumber, Integer pageSize){
+        User me = this.authUtil.getLoggedInUser();
+        Page<Post> posts = this.postRepo.findFeed(me, PageUtil.build(pageNumber, pageSize, "postId", "desc"));
+        return PageResponse.of(posts, this.postMapper::toDto);
+    }
+
     // search
     @Override
     public List<PostDto> searchPosts(String keyword){

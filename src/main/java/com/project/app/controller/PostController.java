@@ -109,6 +109,15 @@ public class PostController {
         return ResponseEntity.ok(this.postService.getPostsByCategory(categoryId, pageNumber, pageSize, sortBy, sortDirection));
     }
 
+    // posts from followed users
+    @GetMapping("/feed")
+    public ResponseEntity<PageResponse<PostDto>> getFeed(
+        @RequestParam (value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+        @RequestParam (value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize
+    ){
+        return ResponseEntity.ok(this.postService.getFeed(pageNumber, pageSize));
+    }
+
     // search posts
     @GetMapping("/posts/search/{keyword}")
     public ResponseEntity<List<PostDto>> searchPosts(@PathVariable("keyword") String keyword){

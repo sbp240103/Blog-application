@@ -19,5 +19,6 @@ public interface PostService {
     PageResponse<PostDto> getPostsByUser(Integer userId, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection);
     PageResponse<PostDto> getPostsByCategory(Integer categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection);
     PageResponse<PostDto> getPostsByTag(String tagName, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection);
+    PageResponse<PostDto> getFeed(Integer pageNumber, Integer pageSize);
     List<PostDto> searchPosts(String keyword);
 }

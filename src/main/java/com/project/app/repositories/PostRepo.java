@@ -22,6 +22,10 @@ public interface PostRepo extends JpaRepository<Post, Integer> {
 
     Page<Post> findByTagsName(String tagName, Pageable pageable);
 
+    // posts written by everyone the given user follows
+    @Query ("select p from Post p where p.user in (select f.following from Follow f where f.follower = :user)")
+    Page<Post> findFeed(@Param("user") User user, Pageable pageable);
+
     // atomic increment so concurrent readers never lose a view
     @Modifying
     @Transactional
