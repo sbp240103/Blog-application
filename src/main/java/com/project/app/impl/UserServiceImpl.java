@@ -17,6 +17,7 @@ import com.project.app.config.AppConstants;
 import com.project.app.entities.Role;
 import com.project.app.repositories.BookmarkRepo;
 import com.project.app.repositories.CommentRepo;
+import com.project.app.repositories.FollowRepo;
 import com.project.app.repositories.PostLikeRepo;
 import com.project.app.repositories.RoleRepo;
 import com.project.app.repositories.UserRepo;
@@ -52,6 +53,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private BookmarkRepo bookmarkRepo;
+
+    @Autowired
+    private FollowRepo followRepo;
 
     @Override
     public UserDto registerNewUser(UserDto userDto) {
@@ -144,6 +148,7 @@ public class UserServiceImpl implements UserService {
         this.commentRepo.deleteByUser(user);
         this.postLikeRepo.deleteByUser(user);
         this.bookmarkRepo.deleteByUser(user);
+        this.followRepo.deleteByFollowerOrFollowing(user, user);
 
         this.userRepo.delete(user);
     }
