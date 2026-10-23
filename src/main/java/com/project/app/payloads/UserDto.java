@@ -1,5 +1,8 @@
 package com.project.app.payloads;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Email;
@@ -32,4 +35,8 @@ public class UserDto {
 
     @NotEmpty(message = "about should not be empty")
     private String about;
+
+    // roles are managed by admins, never accepted from the request body
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Set<RoleDto> roles = new HashSet<>();
 }

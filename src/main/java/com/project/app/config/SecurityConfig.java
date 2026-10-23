@@ -41,6 +41,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                     .requestMatchers("/api/users/me", "/api/users/me/**").authenticated()
                     .requestMatchers("/api/bookmarks", "/api/feed").authenticated()
+                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                     .requestMatchers(HttpMethod.DELETE, "/api/users/*/follow").authenticated()
                     .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
