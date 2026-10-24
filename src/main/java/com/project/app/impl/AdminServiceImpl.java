@@ -10,8 +10,16 @@ import com.project.app.entities.Role;
 import com.project.app.entities.User;
 import com.project.app.exceptions.ApiException;
 import com.project.app.exceptions.ResouceNotFoundException;
+import com.project.app.payloads.StatsDto;
 import com.project.app.payloads.UserDto;
+import com.project.app.repositories.BookmarkRepo;
+import com.project.app.repositories.CategoryRepo;
+import com.project.app.repositories.CommentRepo;
+import com.project.app.repositories.FollowRepo;
+import com.project.app.repositories.PostLikeRepo;
+import com.project.app.repositories.PostRepo;
 import com.project.app.repositories.RoleRepo;
+import com.project.app.repositories.TagRepo;
 import com.project.app.repositories.UserRepo;
 import com.project.app.security.AuthUtil;
 import com.project.app.services.AdminService;
@@ -30,6 +38,27 @@ public class AdminServiceImpl implements AdminService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private PostRepo postRepo;
+
+    @Autowired
+    private CommentRepo commentRepo;
+
+    @Autowired
+    private CategoryRepo categoryRepo;
+
+    @Autowired
+    private TagRepo tagRepo;
+
+    @Autowired
+    private PostLikeRepo postLikeRepo;
+
+    @Autowired
+    private BookmarkRepo bookmarkRepo;
+
+    @Autowired
+    private FollowRepo followRepo;
 
     @Override
     public UserDto promoteToAdmin(Integer userId) {
@@ -57,6 +86,19 @@ public class AdminServiceImpl implements AdminService {
             throw new ApiException("user is not an admin");
         }
         return this.modelMapper.map(this.userRepo.save(user), UserDto.class);
+    }
+
+    @Override
+    public StatsDto getStats() {
+        return new StatsDto(
+                this.userRepo.count(),
+                this.postRepo.count(),
+                this.commentRepo.count(),
+                this.categoryRepo.count(),
+                this.tagRepo.count(),
+                this.postLikeRepo.count(),
+                this.bookmarkRepo.count(),
+                this.followRepo.count());
     }
 
     private Role adminRole() {
