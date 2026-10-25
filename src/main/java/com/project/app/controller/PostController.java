@@ -109,6 +109,14 @@ public class PostController {
         return ResponseEntity.ok(this.postService.getPostsByCategory(categoryId, pageNumber, pageSize, sortBy, sortDirection));
     }
 
+    // most viewed posts
+    @GetMapping("/posts/trending")
+    public ResponseEntity<List<PostDto>> getTrendingPosts(
+        @RequestParam (value = "limit", defaultValue = "5", required = false) Integer limit
+    ){
+        return ResponseEntity.ok(this.postService.getTrendingPosts(limit));
+    }
+
     // posts from followed users
     @GetMapping("/feed")
     public ResponseEntity<PageResponse<PostDto>> getFeed(

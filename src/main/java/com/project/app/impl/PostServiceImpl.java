@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -213,6 +215,18 @@ public class PostServiceImpl implements PostService {
         User me = this.authUtil.getLoggedInUser();
         Page<Post> posts = this.postRepo.findFeed(me, PageUtil.build(pageNumber, pageSize, "postId", "desc"));
         return PageResponse.of(posts, this.postMapper::toDto);
+    }
+
+    // most viewed posts, newer posts win a tie
+    @Override
+    public List<PostDto> getTrendingPosts(Integer limit){
+        if (limit == null || limit < 1 || limit > 50) {
+            throw new ApiException("limit must be between 1 and 50");
+        }
+        Sort sort = Sort.by(Sort.Order.desc("viewCount"), Sort.Order.desc("postId"));
+        return this.postRepo.findAll(PageRequest.of(0, limit, sort)).stream()
+                .map(this.postMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     // search
