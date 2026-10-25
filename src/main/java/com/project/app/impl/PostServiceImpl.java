@@ -217,10 +217,12 @@ public class PostServiceImpl implements PostService {
 
     // search
     @Override
-    public List<PostDto> searchPosts(String keyword){
-        List<Post> posts = this.postRepo.searchByTitle("%" + keyword + "%");
-        List<PostDto> postDtos= posts.stream().map(this.postMapper::toDto).collect(Collectors.toList());
-        return postDtos;
+    public PageResponse<PostDto> searchPosts(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection){
+        if (keyword == null || keyword.trim().length() < 2) {
+            throw new ApiException("search keyword must have at least 2 characters");
+        }
+        Page<Post> posts = this.postRepo.search(keyword.trim(), PageUtil.build(pageNumber, pageSize, sortBy, sortDirection));
+        return PageResponse.of(posts, this.postMapper::toDto);
     }
 
 }

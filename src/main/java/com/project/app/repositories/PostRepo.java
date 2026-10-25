@@ -1,7 +1,5 @@
 package com.project.app.repositories;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,7 +30,9 @@ public interface PostRepo extends JpaRepository<Post, Integer> {
     @Query ("update Post p set p.viewCount = p.viewCount + 1 where p.postId = :postId")
     void incrementViewCount(@Param("postId") Integer postId);
 
-    @Query ("select p from Post p where p.title like :key")
-    List<Post> searchByTitle(String key);
+    // case insensitive match on title or content
+    @Query ("select p from Post p where lower(p.title) like lower(concat('%', :keyword, '%')) "
+            + "or lower(p.content) like lower(concat('%', :keyword, '%'))")
+    Page<Post> search(@Param("keyword") String keyword, Pageable pageable);
 
 }

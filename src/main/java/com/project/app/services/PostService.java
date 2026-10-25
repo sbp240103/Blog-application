@@ -1,7 +1,6 @@
 package com.project.app.services;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,5 +19,5 @@ public interface PostService {
     PageResponse<PostDto> getPostsByCategory(Integer categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection);
     PageResponse<PostDto> getPostsByTag(String tagName, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection);
     PageResponse<PostDto> getFeed(Integer pageNumber, Integer pageSize);
-    List<PostDto> searchPosts(String keyword);
+    PageResponse<PostDto> searchPosts(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection);
 }

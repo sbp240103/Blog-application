@@ -120,8 +120,14 @@ public class PostController {
 
     // search posts
     @GetMapping("/posts/search/{keyword}")
-    public ResponseEntity<List<PostDto>> searchPosts(@PathVariable("keyword") String keyword){
-        return ResponseEntity.ok(this.postService.searchPosts(keyword));
+    public ResponseEntity<PageResponse<PostDto>> searchPosts(
+        @PathVariable("keyword") String keyword,
+        @RequestParam (value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+        @RequestParam (value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+        @RequestParam (value = "sortBy", defaultValue = "postId", required = false) String sortBy,
+        @RequestParam (value = "sortDirection", defaultValue = "desc", required = false) String sortDirection
+    ){
+        return ResponseEntity.ok(this.postService.searchPosts(keyword, pageNumber, pageSize, sortBy, sortDirection));
     }
 
     // post image upload
