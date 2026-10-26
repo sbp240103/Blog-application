@@ -19,8 +19,9 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtTokenHelper {
 
-    // five hours, in milliseconds
-    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60 * 1000;
+    // how long a token stays valid, five hours unless configured otherwise
+    @Value("${jwt.expiration-ms:18000000}")
+    private long tokenValidity;
 
     @Value("${jwt.secret:a-very-long-default-development-secret-key-for-hs256-change-me}")
     private String secret;
@@ -64,7 +65,7 @@ public class JwtTokenHelper {
                 .claims(claims)
                 .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
+                .expiration(new Date(System.currentTimeMillis() + this.tokenValidity))
                 .signWith(getSigningKey())
                 .compact();
     }
