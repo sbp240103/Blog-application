@@ -1,244 +1,205 @@
-📝 Blog Application
+# 📝 Blog Application
 
-A full-stack-ready Blog Application backend built with Java and Spring Boot. The application provides a RESTful API for managing users, blog posts, categories, and comments, with a focus on clean architecture, maintainable code, and scalable backend development.
+A production-style REST backend for a blogging platform, built with **Java 17** and **Spring Boot 4**. Users can write posts, organise them with categories and tags, comment, like, bookmark, follow other writers and read a personalised feed. Access is secured with JWT and role-based authorization.
 
-🚀 Overview
+## ✨ Features
 
-This project is a backend application designed for a blogging platform where users can create and manage blog posts, organize content into categories, and interact through comments.
+**Authentication & security**
+- Register and log in with JWT (stateless bearer tokens), plus form login and HTTP Basic
+- Passwords hashed with BCrypt, change password for the logged in user
+- Roles stored in the database (`ROLE_USER`, `ROLE_ADMIN`), admin endpoints protected with `@PreAuthorize`
+- Ownership rules: only the author (or an admin) can edit or delete a post, comment or account
+- Optional admin account seeded from environment variables
+- CORS configuration for browser frontends
 
-The application follows a layered architecture to separate API handling, business logic, data access, and application concerns.
+**Content**
+- Posts with categories, tags (many to many), image upload and view counts
+- Comments with author and timestamp
+- Likes, bookmarks and "who liked this"
+- Follow / unfollow users, followers and following lists
+- Personalised feed with posts from followed users
+- Trending posts by views
+- Case insensitive search over title and content
 
-✨ Features
-👤 User Management
-Create users
-Get user details
-Update user information
-Delete users
-Manage user roles
-📝 Post Management
-Create blog posts
-Get all posts
-Get post by ID
-Update posts
-Delete posts
-Get posts by user
-Get posts by category
-Search posts
-📂 Category Management
-Create categories
-Get all categories
-Get category by ID
-Update categories
-Delete categories
-Retrieve posts by category
-💬 Comment Management
-Add comments to posts
-Retrieve comments
-Update comments
-Delete comments
-🔍 API Features
-Pagination
-Sorting
-Search functionality
-Request validation
-Exception handling
-Standardized API responses
-🛠️ Tech Stack
-Java
-Spring Boot
-Spring MVC
-Spring Data JPA
-Hibernate
-MySQL
-Maven
-Postman
-Git & GitHub
-🏗️ Architecture
+**API quality**
+- Pagination and sorting on every listing (`pageNumber`, `pageSize`, `sortBy`, `sortDirection`)
+- Request validation with clear field level error messages
+- Consistent JSON errors (400, 401, 403, 404, 409, 413) from a global exception handler
+- Image upload validation (jpg / jpeg / png, max 5 MB) and safe file serving
+- Swagger UI / OpenAPI documentation with JWT support
+- Actuator health and info endpoints
+- Unit tests for services and JWT handling
 
-The application follows a layered architecture:
+## 🛠️ Tech Stack
 
-Client
-   │
-   ▼
-Controller Layer
-   │
-   ▼
-Service Layer
-   │
-   ▼
-Repository Layer
-   │
-   ▼
-Database
+Java 17 · Spring Boot 4 · Spring MVC · Spring Security · Spring Data JPA / Hibernate · MySQL · JJWT · ModelMapper · Lombok · springdoc-openapi · JUnit 5 · Mockito · Maven
 
-Project Structure
-src/
-└── main/
-    ├── java/
-    │   └── com.example.blog/
-    │       ├── controller/
-    │       ├── service/
-    │       ├── repository/
-    │       ├── entity/
-    │       ├── payload/
-    │       ├── exception/
-    │       ├── config/
-    │       └── BlogApplication.java
-    │
-    └── resources/
-        ├── application.properties
-        └── static/
+## 🏗️ Architecture
 
-⚙️ Getting Started
-Prerequisites
+```
+Client ──> Controller ──> Service ──> Repository ──> MySQL
+             │              │
+             │              └── PostMapper / AuthUtil / PageUtil
+             └── DTOs + validation      JwtAuthenticationFilter runs before every request
+```
 
-Make sure you have the following installed:
+```
+src/main/java/com/project/app
+├── config/        security, cors, openapi, role and admin seeding
+├── controller/    rest endpoints
+├── entities/      jpa entities
+├── exceptions/    ApiException, ResouceNotFoundException, GlobalExceptionHandler
+├── impl/          service implementations
+├── payloads/      request and response dtos
+├── repositories/  spring data repositories
+├── security/      jwt filter, token helper, AuthUtil
+├── services/      service interfaces
+└── utils/         pagination and mapping helpers
+```
 
-Java JDK 17+
-Maven
-MySQL
-Git
-Postman
-Clone the Repository
-git clone https://github.com/<your-username>/<repository-name>.git
+## ⚙️ Getting Started
 
-cd <repository-name>
+### Prerequisites
+Java 17+, Maven (or the included `mvnw`), MySQL 8
 
-Configure Database
+### Configure
+Secrets are never committed. Create a `.env` file in the project root (it is gitignored):
 
-Create a MySQL database:
+```properties
+MYSQL_DB_USER=root
+MYSQL_DB_PASSWORD=your_password
+MYSQL_DB_NAME=blog_app
+```
 
-CREATE DATABASE blog_app;
+The database is created automatically if it does not exist. Optional variables:
 
+| Variable | Purpose | Default |
+|---|---|---|
+| `SERVER_PORT` | HTTP port | `9090` |
+| `MYSQL_DB_HOST` / `MYSQL_DB_PORT` | database location | `localhost` / `3306` |
+| `JWT_SECRET` | token signing key, at least 32 characters | development key |
+| `JWT_EXPIRATION_MS` | token lifetime | `18000000` (5 hours) |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | seed an admin account on startup | not seeded |
+| `CORS_ALLOWED_ORIGINS` | comma separated frontend origins | `http://localhost:3000,http://localhost:5173` |
 
-Configure the database connection in:
+### Run
 
-src/main/resources/application.properties
+```bash
+./mvnw spring-boot:run
+```
 
+- API: `http://localhost:9090`
+- Swagger UI: `http://localhost:9090/swagger-ui.html`
+- Health: `http://localhost:9090/actuator/health`
 
-Example:
+### Test
 
-spring.datasource.url=jdbc:mysql://localhost:3306/blog_app
-spring.datasource.username=root
-spring.datasource.password=your_password
+```bash
+./mvnw test
+```
 
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
+## 🔐 Using the API
 
+```bash
+# register
+curl -X POST http://localhost:9090/api/v1/auth/register -H "Content-Type: application/json" \
+  -d '{"name":"Pushkar","email":"pushkar@example.com","password":"secret123","about":"java dev"}'
 
-Keep sensitive credentials out of version control.
+# login, the response contains a token and the user
+curl -X POST http://localhost:9090/api/v1/auth/login -H "Content-Type: application/json" \
+  -d '{"email":"pushkar@example.com","password":"secret123"}'
 
-▶️ Run the Application
+# call a protected endpoint
+curl http://localhost:9090/api/users/me -H "Authorization: Bearer <token>"
+```
 
-Using Maven:
+All `GET` endpoints are public except the personal ones (`/me`, `/feed`, `/bookmarks`) and `/api/admin/**`.
 
-mvn spring-boot:run
+## 🔗 API Reference
 
+**Auth**
+```
+POST   /api/v1/auth/register
+POST   /api/v1/auth/login
+```
 
-Or build the project:
+**Users**
+```
+GET    /api/users                          paginated
+POST   /api/users
+GET    /api/users/me                       logged in user
+PUT    /api/users/me/password              change password
+GET    /api/users/{userId}
+PUT    /api/users/{userId}                 owner or admin
+DELETE /api/users/{userId}                 admin
+```
 
-mvn clean install
+**Follows**
+```
+POST   /api/users/{userId}/follow
+DELETE /api/users/{userId}/follow
+GET    /api/users/{userId}/followers
+GET    /api/users/{userId}/following
+GET    /api/users/{userId}/follow-stats
+```
 
+**Posts**
+```
+GET    /api/posts                          paginated, sortable
+POST   /api/user/{userId}/category/{categoryId}/posts
+GET    /api/posts/{postId}                 counts a view
+PUT    /api/posts/{postId}                 owner or admin
+DELETE /api/posts/{postId}                 owner or admin
+GET    /api/user/{userId}/posts
+GET    /api/category/{categoryId}/posts
+GET    /api/posts/search/{keyword}
+GET    /api/posts/trending?limit=5
+GET    /api/feed                           posts from followed users
+POST   /api/post/image/upload/{postId}     multipart field "image"
+GET    /api/post/image/{imageName}
+```
 
-The application will be available at:
+**Likes & bookmarks**
+```
+POST   /api/posts/{postId}/like
+DELETE /api/posts/{postId}/like
+GET    /api/posts/{postId}/likes
+POST   /api/posts/{postId}/bookmark
+DELETE /api/posts/{postId}/bookmark
+GET    /api/bookmarks
+```
 
-http://localhost:8080
+**Comments**
+```
+GET    /api/post/{postId}/comments
+POST   /api/post/{postId}/comments
+PUT    /api/comments/{commentId}           author
+DELETE /api/comments/{commentId}           author, post owner or admin
+```
 
-🔗 API Endpoints
-Users
-POST    /api/users/
-GET     /api/users/
-GET     /api/users/{userId}
-PUT     /api/users/{userId}
-DELETE  /api/users/{userId}
+**Categories & tags**
+```
+GET    /api/categories                     paginated
+POST   /api/categories                     admin
+GET    /api/categories/{categoryId}
+PUT    /api/categories/{categoryId}        admin
+DELETE /api/categories/{categoryId}        admin
+GET    /api/tags
+GET    /api/tags/{tagName}/posts
+```
 
-Posts
-POST    /api/posts/
-GET     /api/posts/
-GET     /api/posts/{postId}
-PUT     /api/posts/{postId}
-DELETE  /api/posts/{postId}
+**Admin**
+```
+GET    /api/admin/stats
+PUT    /api/admin/users/{userId}/promote
+PUT    /api/admin/users/{userId}/demote
+```
 
-Categories
-POST    /api/categories/
-GET     /api/categories/
-GET     /api/categories/{categoryId}
-PUT     /api/categories/{categoryId}
-DELETE  /api/categories/{categoryId}
-
-Comments
-POST    /api/comments/
-GET     /api/comments/post/{postId}
-PUT     /api/comments/{commentId}
-DELETE  /api/comments/{commentId}
-
-Health
-GET     /api/health
-
-
-Endpoint names may evolve as the application develops.
-
-🧪 API Testing
-
-The REST APIs can be tested using Postman.
-
-The project can be tested by creating users, categories, posts, and comments and verifying the corresponding CRUD operations and API responses.
-
-📈 Development Roadmap
- Spring Boot project setup
- Database configuration
- User management
- Category management
- Post management
- Comment management
- DTO implementation
- Validation
- Exception handling
- Pagination
- Sorting
- Search
- Authentication
- Authorization
- API documentation
- Unit testing
- Deployment
-🔮 Future Enhancements
-JWT-based authentication
-Role-based authorization
-Swagger / OpenAPI documentation
-Image upload and management
-Advanced post search
-Unit and integration testing
-Docker support
-CI/CD pipeline
-Cloud deployment
-Frontend integration
-💡 Key Concepts
-
-This project demonstrates practical implementation of:
-
-RESTful API design
-CRUD operations
-Dependency Injection
-Spring Boot
-Spring Data JPA
-Hibernate ORM
-Entity relationships
-DTOs
-Service and repository patterns
-Exception handling
-Input validation
-Pagination and sorting
-Authentication and authorization
-Database management
-📄 License
+## 📄 License
 
 This project is intended for educational and development purposes.
 
-👨‍💻 Author
+## 👨‍💻 Author
 
-Pushkar Singh
-
-Java Backend Developer
-
+**Pushkar Singh** — Java Backend Developer
 GitHub: https://github.com/sbp240103
