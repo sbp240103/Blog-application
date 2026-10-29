@@ -35,6 +35,7 @@ import com.project.app.utils.PostMapper;
 import com.project.app.services.FileService;
 import com.project.app.services.PostService;
 import com.project.app.exceptions.ResouceNotFoundException;
+import com.project.app.config.AppConstants;
 
 @Service 
 public class PostServiceImpl implements PostService {
@@ -178,7 +179,7 @@ public class PostServiceImpl implements PostService {
     // getall
     @Override
     public PageResponse<PostDto> getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection){
-        Page<Post> pagePost = this.postRepo.findAll(PageUtil.build(pageNumber, pageSize, sortBy, sortDirection));
+        Page<Post> pagePost = this.postRepo.findAll(PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.POST_SORT_FIELDS));
         return PageResponse.of(pagePost, this.postMapper::toDto);
     }
 
@@ -186,7 +187,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PageResponse<PostDto> getPostsByUser(Integer userId, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection){
         User user = this.userRepo.findById(userId).orElseThrow(()-> new ResouceNotFoundException("User", "Id", userId));
-        Page<Post> posts = this.postRepo.findByUser(user, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection));
+        Page<Post> posts = this.postRepo.findByUser(user, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.POST_SORT_FIELDS));
         return PageResponse.of(posts, this.postMapper::toDto);
     }
 
@@ -194,7 +195,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PageResponse<PostDto> getPostsByCategory(Integer categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection){
         Category category = this.categoryRepo.findById(categoryId).orElseThrow(()-> new ResouceNotFoundException("Category", "Id", categoryId));
-        Page<Post> posts = this.postRepo.findByCategory(category, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection));
+        Page<Post> posts = this.postRepo.findByCategory(category, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.POST_SORT_FIELDS));
         return PageResponse.of(posts, this.postMapper::toDto);
     }
 
@@ -205,7 +206,7 @@ public class PostServiceImpl implements PostService {
         if (this.tagRepo.findByName(name).isEmpty()) {
             throw new ApiException("tag not found : " + name, HttpStatus.NOT_FOUND);
         }
-        Page<Post> posts = this.postRepo.findByTagsName(name, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection));
+        Page<Post> posts = this.postRepo.findByTagsName(name, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.POST_SORT_FIELDS));
         return PageResponse.of(posts, this.postMapper::toDto);
     }
 
@@ -235,7 +236,7 @@ public class PostServiceImpl implements PostService {
         if (keyword == null || keyword.trim().length() < 2) {
             throw new ApiException("search keyword must have at least 2 characters");
         }
-        Page<Post> posts = this.postRepo.search(keyword.trim(), PageUtil.build(pageNumber, pageSize, sortBy, sortDirection));
+        Page<Post> posts = this.postRepo.search(keyword.trim(), PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.POST_SORT_FIELDS));
         return PageResponse.of(posts, this.postMapper::toDto);
     }
 

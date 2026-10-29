@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public PageResponse<UserDto> getAllUsers(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection) {
-        Page<User> page = this.userRepo.findAll(PageUtil.build(pageNumber, pageSize, sortBy, sortDirection));
+        Page<User> page = this.userRepo.findAll(PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.USER_SORT_FIELDS));
         return PageResponse.of(page, this::userToDto);
     }
 

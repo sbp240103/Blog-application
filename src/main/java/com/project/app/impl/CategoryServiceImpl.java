@@ -12,6 +12,7 @@ import com.project.app.payloads.CategoryDto;
 import com.project.app.payloads.PageResponse;
 import com.project.app.services.CategoryService;
 import com.project.app.exceptions.ResouceNotFoundException;
+import com.project.app.config.AppConstants;
 
 @Service 
 public class CategoryServiceImpl implements CategoryService {
@@ -60,7 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
     // getall
     @Override
     public PageResponse<CategoryDto> getAllCategory(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection){
-        Page<Category> page = this.categoryRepo.findAll(PageUtil.build(pageNumber, pageSize, sortBy, sortDirection));
+        Page<Category> page = this.categoryRepo.findAll(PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.CATEGORY_SORT_FIELDS));
         return PageResponse.of(page, category -> this.modelMapper.map(category, CategoryDto.class));
     }
 
