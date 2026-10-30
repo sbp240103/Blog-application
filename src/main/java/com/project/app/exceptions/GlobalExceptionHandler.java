@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.project.app.payloads.ApiResponse;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -74,6 +75,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ApiResponse> maxUploadSizeExceptionHandler(MaxUploadSizeExceededException ex) {
         return new ResponseEntity<>(new ApiResponse("uploaded file is too large", false), HttpStatus.CONTENT_TOO_LARGE);
+    }
+
+    // somebody else saved the same record between our read and write
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ApiResponse> optimisticLockExceptionHandler(ObjectOptimisticLockingFailureException ex) {
+        return new ResponseEntity<>(new ApiResponse("this record was changed by someone else, reload and try again", false), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

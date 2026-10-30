@@ -25,6 +25,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
 import org.hibernate.annotations.UpdateTimestamp;
+import jakarta.persistence.Version;
 
 @Entity 
 @Table (name = "post")
@@ -54,6 +55,11 @@ public class Post {
     // last time the post content was changed, view count updates do not touch it
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    // optimistic locking, two people saving the same post at once can not overwrite each other
+    @Version
+    @Column (nullable = false, columnDefinition = "bigint default 0")
+    private Long version = 0L;
 
     @ManyToOne 
     @JoinColumn (name = "category_id")
