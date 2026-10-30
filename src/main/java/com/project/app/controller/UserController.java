@@ -21,6 +21,8 @@ import com.project.app.payloads.UserDto;
 import jakarta.validation.Valid;
 import com.project.app.services.UserService;
 import com.project.app.payloads.ApiResponse;
+import org.springframework.web.bind.annotation.PatchMapping;
+import com.project.app.payloads.UpdateProfileRequest;
 
 @RestController
 @RequestMapping("/api/users")
@@ -67,6 +69,12 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(){
         return ResponseEntity.ok(this.userService.getCurrentUser());
+    }
+
+    // update name or about of the logged in user without resending the password
+    @PatchMapping("/me")
+    public ResponseEntity<UserDto> updateProfile(@Valid @RequestBody UpdateProfileRequest request){
+        return ResponseEntity.ok(this.userService.updateProfile(request));
     }
 
     // change password of the logged in user

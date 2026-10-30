@@ -26,6 +26,7 @@ import com.project.app.services.UserService;
 import com.project.app.entities.User;
 import com.project.app.exceptions.ApiException;
 import com.project.app.exceptions.ResouceNotFoundException;
+import com.project.app.payloads.UpdateProfileRequest;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -116,6 +117,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getCurrentUser() {
         return this.userToDto(this.authUtil.getLoggedInUser());
+    }
+
+    // partial update of the logged in user, password and email are not touched here
+    @Override
+    public UserDto updateProfile(UpdateProfileRequest request) {
+        if (request.getName() == null && request.getAbout() == null) {
+            throw new ApiException("nothing to update, send name and or about");
+        }
+
+        User user = this.authUtil.getLoggedInUser();
+        if (request.getName() != null) {
+            user.setName(request.getName().trim());
+        }
+        if (request.getAbout() != null) {
+            user.setAbout(request.getAbout().trim());
+        }
+        return this.userToDto(this.userRepo.save(user));
     }
 
     @Override
