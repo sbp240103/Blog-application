@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor 
 @Getter 
@@ -48,5 +49,8 @@ public class PostDto {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer viewCount;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private LocalDateTime updatedAt;
 
 }

@@ -23,6 +23,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalDateTime;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity 
 @Table (name = "post")
@@ -48,6 +50,10 @@ public class Post {
     // how many times the post was opened, defaults to 0 for existing rows
     @Column (nullable = false, columnDefinition = "int default 0")
     private Integer viewCount = 0;
+
+    // last time the post content was changed, view count updates do not touch it
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     @ManyToOne 
     @JoinColumn (name = "category_id")

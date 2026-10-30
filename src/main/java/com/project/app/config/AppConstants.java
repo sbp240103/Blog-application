@@ -18,6 +18,6 @@ public class AppConstants {
     // only these fields may be used in sortBy, anything else (like password) is rejected
     public static final Set<String> USER_SORT_FIELDS = Set.of("id", "name", "email");
     public static final Set<String> CATEGORY_SORT_FIELDS = Set.of("categoryId", "categoryTitle");
-    public static final Set<String> POST_SORT_FIELDS = Set.of("postId", "title", "addDate", "viewCount");
+    public static final Set<String> POST_SORT_FIELDS = Set.of("postId", "title", "addDate", "viewCount", "updatedAt");
 
 }
