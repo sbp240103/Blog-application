@@ -50,6 +50,13 @@ public class PostDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private long commentCount;
 
+    // only filled for logged in viewers, false for anonymous requests
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private boolean likedByMe;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private boolean bookmarkedByMe;
+
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer viewCount;
 

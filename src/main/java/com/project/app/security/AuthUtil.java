@@ -31,6 +31,16 @@ public class AuthUtil {
                 .orElseThrow(() -> new ApiException("logged in user no longer exists", HttpStatus.UNAUTHORIZED));
     }
 
+    // same as getLoggedInUser but gives null for anonymous requests instead of failing
+    public User getLoggedInUserOrNull() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            return null;
+        }
+        return this.userRepo.findByEmail(authentication.getName()).orElse(null);
+    }
+
     public boolean isAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {

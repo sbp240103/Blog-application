@@ -12,6 +12,9 @@ import com.project.app.entities.Tag;
 import com.project.app.payloads.PostDto;
 import com.project.app.repositories.PostLikeRepo;
 import com.project.app.repositories.CommentRepo;
+import com.project.app.entities.User;
+import com.project.app.repositories.BookmarkRepo;
+import com.project.app.security.AuthUtil;
 
 // single place that turns a post entity into the dto sent to clients,
 // so computed fields like like count are filled the same way everywhere
@@ -27,10 +30,22 @@ public class PostMapper {
     @Autowired
     private CommentRepo commentRepo;
 
+    @Autowired
+    private BookmarkRepo bookmarkRepo;
+
+    @Autowired
+    private AuthUtil authUtil;
+
     public PostDto toDto(Post post) {
         PostDto postDto = this.modelMapper.map(post, PostDto.class);
         postDto.setLikeCount(this.postLikeRepo.countByPost(post));
         postDto.setCommentCount(this.commentRepo.countByPost(post));
+
+        User viewer = this.authUtil.getLoggedInUserOrNull();
+        if (viewer != null) {
+            postDto.setLikedByMe(this.postLikeRepo.existsByUserAndPost(viewer, post));
+            postDto.setBookmarkedByMe(this.bookmarkRepo.existsByUserAndPost(viewer, post));
+        }
         postDto.setTagNames(post.getTags().stream().map(Tag::getName).collect(Collectors.toCollection(TreeSet::new)));
         return postDto;
     }
