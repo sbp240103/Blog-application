@@ -11,17 +11,23 @@ import org.springframework.transaction.annotation.Transactional;
 import com.project.app.entities.Category;
 import com.project.app.entities.Post;
 import com.project.app.entities.User;
+import com.project.app.entities.PostStatus;
 
 public interface PostRepo extends JpaRepository<Post, Integer> {
 
     Page<Post> findByUser(User user, Pageable pageable);
 
-    Page<Post> findByCategory(Category category, Pageable pageable);
+    Page<Post> findByUserAndStatus(User user, PostStatus status, Pageable pageable);
 
-    Page<Post> findByTagsName(String tagName, Pageable pageable);
+    Page<Post> findByStatus(PostStatus status, Pageable pageable);
+
+    Page<Post> findByCategoryAndStatus(Category category, PostStatus status, Pageable pageable);
+
+    Page<Post> findByTagsNameAndStatus(String tagName, PostStatus status, Pageable pageable);
 
     // posts written by everyone the given user follows
-    @Query ("select p from Post p where p.user in (select f.following from Follow f where f.follower = :user)")
+    @Query ("select p from Post p where p.status = com.project.app.entities.PostStatus.PUBLISHED "
+            + "and p.user in (select f.following from Follow f where f.follower = :user)")
     Page<Post> findFeed(@Param("user") User user, Pageable pageable);
 
     // atomic increment so concurrent readers never lose a view
@@ -31,8 +37,9 @@ public interface PostRepo extends JpaRepository<Post, Integer> {
     void incrementViewCount(@Param("postId") Integer postId);
 
     // case insensitive match on title or content
-    @Query ("select p from Post p where lower(p.title) like lower(concat('%', :keyword, '%')) "
-            + "or lower(p.content) like lower(concat('%', :keyword, '%'))")
+    @Query ("select p from Post p where p.status = com.project.app.entities.PostStatus.PUBLISHED "
+            + "and (lower(p.title) like lower(concat('%', :keyword, '%')) "
+            + "or lower(p.content) like lower(concat('%', :keyword, '%')))")
     Page<Post> search(@Param("keyword") String keyword, Pageable pageable);
 
 }

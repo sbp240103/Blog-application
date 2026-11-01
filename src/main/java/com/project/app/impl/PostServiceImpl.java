@@ -37,6 +37,7 @@ import com.project.app.services.PostService;
 import com.project.app.exceptions.ResouceNotFoundException;
 import com.project.app.config.AppConstants;
 import com.project.app.entities.PostStatus;
+import org.springframework.data.domain.Pageable;
 
 @Service 
 public class PostServiceImpl implements PostService {
@@ -196,7 +197,17 @@ public class PostServiceImpl implements PostService {
     public PostDto getPostById(Integer postId){
         Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
 
-        // every read of a single post counts as one view
+        // a draft looks like it does not exist to anyone but its author and admins
+        if (post.getStatus() == PostStatus.DRAFT) {
+            User viewer = this.authUtil.getLoggedInUserOrNull();
+            boolean isOwner = viewer != null && post.getUser() != null && post.getUser().getId() == viewer.getId();
+            if (!isOwner && !this.authUtil.isAdmin()) {
+                throw new ResouceNotFoundException("Post", "Id", postId);
+            }
+            return this.postMapper.toDto(post);
+        }
+
+        // every read of a single published post counts as one view
         this.postRepo.incrementViewCount(postId);
         post.setViewCount(post.getViewCount() + 1);
 
@@ -206,7 +217,7 @@ public class PostServiceImpl implements PostService {
     // getall
     @Override
     public PageResponse<PostDto> getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection){
-        Page<Post> pagePost = this.postRepo.findAll(PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.POST_SORT_FIELDS));
+        Page<Post> pagePost = this.postRepo.findByStatus(PostStatus.PUBLISHED, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.POST_SORT_FIELDS));
         return PageResponse.of(pagePost, this.postMapper::toDto);
     }
 
@@ -214,7 +225,14 @@ public class PostServiceImpl implements PostService {
     @Override
     public PageResponse<PostDto> getPostsByUser(Integer userId, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection){
         User user = this.userRepo.findById(userId).orElseThrow(()-> new ResouceNotFoundException("User", "Id", userId));
-        Page<Post> posts = this.postRepo.findByUser(user, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.POST_SORT_FIELDS));
+        Pageable pageable = PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.POST_SORT_FIELDS);
+
+        // authors and admins also see drafts, everyone else only published posts
+        User viewer = this.authUtil.getLoggedInUserOrNull();
+        boolean canSeeDrafts = viewer != null && (viewer.getId() == user.getId() || this.authUtil.isAdmin());
+        Page<Post> posts = canSeeDrafts
+                ? this.postRepo.findByUser(user, pageable)
+                : this.postRepo.findByUserAndStatus(user, PostStatus.PUBLISHED, pageable);
         return PageResponse.of(posts, this.postMapper::toDto);
     }
 
@@ -222,7 +240,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PageResponse<PostDto> getPostsByCategory(Integer categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection){
         Category category = this.categoryRepo.findById(categoryId).orElseThrow(()-> new ResouceNotFoundException("Category", "Id", categoryId));
-        Page<Post> posts = this.postRepo.findByCategory(category, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.POST_SORT_FIELDS));
+        Page<Post> posts = this.postRepo.findByCategoryAndStatus(category, PostStatus.PUBLISHED, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.POST_SORT_FIELDS));
         return PageResponse.of(posts, this.postMapper::toDto);
     }
 
@@ -233,7 +251,7 @@ public class PostServiceImpl implements PostService {
         if (this.tagRepo.findByName(name).isEmpty()) {
             throw new ApiException("tag not found : " + name, HttpStatus.NOT_FOUND);
         }
-        Page<Post> posts = this.postRepo.findByTagsName(name, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.POST_SORT_FIELDS));
+        Page<Post> posts = this.postRepo.findByTagsNameAndStatus(name, PostStatus.PUBLISHED, PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.POST_SORT_FIELDS));
         return PageResponse.of(posts, this.postMapper::toDto);
     }
 
@@ -252,7 +270,7 @@ public class PostServiceImpl implements PostService {
             throw new ApiException("limit must be between 1 and 50");
         }
         Sort sort = Sort.by(Sort.Order.desc("viewCount"), Sort.Order.desc("postId"));
-        return this.postRepo.findAll(PageRequest.of(0, limit, sort)).stream()
+        return this.postRepo.findByStatus(PostStatus.PUBLISHED, PageRequest.of(0, limit, sort)).stream()
                 .map(this.postMapper::toDto)
                 .collect(Collectors.toList());
     }
