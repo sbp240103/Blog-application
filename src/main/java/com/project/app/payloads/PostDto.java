@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
+import com.project.app.entities.PostStatus;
 
 @NoArgsConstructor 
 @Getter 
@@ -35,6 +36,9 @@ public class PostDto {
     private CategoryDto category;
 
     private UserDto user;
+
+    // DRAFT or PUBLISHED, a new post is published unless DRAFT is sent
+    private PostStatus status;
 
     private Set<CommentDto> comments = new HashSet<>();
 

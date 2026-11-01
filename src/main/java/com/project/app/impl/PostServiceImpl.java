@@ -36,6 +36,7 @@ import com.project.app.services.FileService;
 import com.project.app.services.PostService;
 import com.project.app.exceptions.ResouceNotFoundException;
 import com.project.app.config.AppConstants;
+import com.project.app.entities.PostStatus;
 
 @Service 
 public class PostServiceImpl implements PostService {
@@ -82,6 +83,7 @@ public class PostServiceImpl implements PostService {
         Post post = this.modelMapper.map(postDto, Post.class);
         post.setPostId(null);
         post.setViewCount(0);
+        post.setStatus(postDto.getStatus() == null ? PostStatus.PUBLISHED : postDto.getStatus());
         post.setImageName(postDto.getImageName() == null ? "default.png" : postDto.getImageName());
         post.setAddDate(new Date(System.currentTimeMillis()));
         post.setUser(user);
@@ -119,6 +121,31 @@ public class PostServiceImpl implements PostService {
         String imageName = post.getImageName();
         this.postRepo.delete(post);
         this.fileService.deleteImage(this.imagePath, imageName);
+    }
+
+    // make a draft visible to everyone, the publish time becomes the post date
+    @Override
+    public PostDto publishPost(Integer postId) {
+        Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
+        this.checkOwnerOrAdmin(post);
+        if (post.getStatus() == PostStatus.PUBLISHED) {
+            throw new ApiException("post is already published", HttpStatus.CONFLICT);
+        }
+        post.setStatus(PostStatus.PUBLISHED);
+        post.setAddDate(new Date(System.currentTimeMillis()));
+        return this.postMapper.toDto(this.postRepo.save(post));
+    }
+
+    // take a post back to draft
+    @Override
+    public PostDto unpublishPost(Integer postId) {
+        Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
+        this.checkOwnerOrAdmin(post);
+        if (post.getStatus() == PostStatus.DRAFT) {
+            throw new ApiException("post is already a draft", HttpStatus.CONFLICT);
+        }
+        post.setStatus(PostStatus.DRAFT);
+        return this.postMapper.toDto(this.postRepo.save(post));
     }
 
     // ownership is checked before the file is written so rejected uploads leave nothing behind

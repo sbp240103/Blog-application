@@ -60,6 +60,18 @@ public class PostController {
         return ResponseEntity.ok(updatedPost);
     }
 
+    // publish a draft
+    @PutMapping ("/posts/{postId}/publish")
+    public ResponseEntity<PostDto> publishPost(@PathVariable ("postId") Integer postId){
+        return ResponseEntity.ok(this.postService.publishPost(postId));
+    }
+
+    // move a post back to draft
+    @PutMapping ("/posts/{postId}/unpublish")
+    public ResponseEntity<PostDto> unpublishPost(@PathVariable ("postId") Integer postId){
+        return ResponseEntity.ok(this.postService.unpublishPost(postId));
+    }
+
     // delete post
 
     @DeleteMapping ("/posts/{postId}")

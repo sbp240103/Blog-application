@@ -13,6 +13,8 @@ public interface PostService {
     PostDto createPost(PostDto postDto, Integer userId, Integer categoryId);
     PostDto updatePost(PostDto postDto, Integer postId);
     void deletePost(Integer postId);
+    PostDto publishPost(Integer postId);
+    PostDto unpublishPost(Integer postId);
     PostDto uploadPostImage(Integer postId, MultipartFile image) throws IOException;
     PostDto getPostById(Integer postId);
     PageResponse<PostDto> getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection);
