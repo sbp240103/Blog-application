@@ -121,6 +121,15 @@ public class PostController {
         return ResponseEntity.ok(this.postService.getPostsByCategory(categoryId, pageNumber, pageSize, sortBy, sortDirection));
     }
 
+    // drafts of the logged in user
+    @GetMapping("/posts/drafts")
+    public ResponseEntity<PageResponse<PostDto>> getMyDrafts(
+        @RequestParam (value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+        @RequestParam (value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize
+    ){
+        return ResponseEntity.ok(this.postService.getMyDrafts(pageNumber, pageSize));
+    }
+
     // most viewed posts
     @GetMapping("/posts/trending")
     public ResponseEntity<List<PostDto>> getTrendingPosts(

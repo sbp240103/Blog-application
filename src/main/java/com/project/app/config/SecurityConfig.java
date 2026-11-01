@@ -53,7 +53,7 @@ public class SecurityConfig {
                     .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                     .requestMatchers("/api/users/me", "/api/users/me/**").authenticated()
-                    .requestMatchers("/api/bookmarks", "/api/feed").authenticated()
+                    .requestMatchers("/api/bookmarks", "/api/feed", "/api/posts/drafts").authenticated()
                     .requestMatchers("/api/admin/**").hasRole("ADMIN")
                     .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                     .requestMatchers(HttpMethod.DELETE, "/api/users/*/follow").authenticated()

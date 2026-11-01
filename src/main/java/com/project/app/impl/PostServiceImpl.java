@@ -263,6 +263,14 @@ public class PostServiceImpl implements PostService {
         return PageResponse.of(posts, this.postMapper::toDto);
     }
 
+    // unpublished posts of the logged in user, most recently changed first
+    @Override
+    public PageResponse<PostDto> getMyDrafts(Integer pageNumber, Integer pageSize){
+        User me = this.authUtil.getLoggedInUser();
+        Page<Post> drafts = this.postRepo.findByUserAndStatus(me, PostStatus.DRAFT, PageUtil.build(pageNumber, pageSize, "postId", "desc"));
+        return PageResponse.of(drafts, this.postMapper::toDto);
+    }
+
     // most viewed posts, newer posts win a tie
     @Override
     public List<PostDto> getTrendingPosts(Integer limit){
