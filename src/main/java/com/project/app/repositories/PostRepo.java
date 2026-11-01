@@ -12,6 +12,8 @@ import com.project.app.entities.Category;
 import com.project.app.entities.Post;
 import com.project.app.entities.User;
 import com.project.app.entities.PostStatus;
+import java.time.LocalDateTime;
+import java.util.List;
 
 public interface PostRepo extends JpaRepository<Post, Integer> {
 
@@ -20,6 +22,8 @@ public interface PostRepo extends JpaRepository<Post, Integer> {
     Page<Post> findByUserAndStatus(User user, PostStatus status, Pageable pageable);
 
     Page<Post> findByStatus(PostStatus status, Pageable pageable);
+
+    List<Post> findByStatusAndPublishAtLessThanEqual(PostStatus status, LocalDateTime time);
 
     Page<Post> findByCategoryAndStatus(Category category, PostStatus status, Pageable pageable);
 

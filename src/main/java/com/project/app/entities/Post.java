@@ -59,6 +59,9 @@ public class Post {
     @Column (nullable = false, length = 20, columnDefinition = "varchar(20) default 'PUBLISHED'")
     private PostStatus status = PostStatus.PUBLISHED;
 
+    // when set on a draft, the post is published automatically at this time
+    private LocalDateTime publishAt;
+
     // last time the post content was changed, view count updates do not touch it
     @UpdateTimestamp
     private LocalDateTime updatedAt;

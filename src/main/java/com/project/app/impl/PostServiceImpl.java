@@ -38,6 +38,7 @@ import com.project.app.exceptions.ResouceNotFoundException;
 import com.project.app.config.AppConstants;
 import com.project.app.entities.PostStatus;
 import org.springframework.data.domain.Pageable;
+import java.time.LocalDateTime;
 
 @Service 
 public class PostServiceImpl implements PostService {
@@ -85,6 +86,14 @@ public class PostServiceImpl implements PostService {
         post.setPostId(null);
         post.setViewCount(0);
         post.setStatus(postDto.getStatus() == null ? PostStatus.PUBLISHED : postDto.getStatus());
+
+        // a scheduled post stays a draft until the scheduler publishes it
+        if (postDto.getPublishAt() != null) {
+            if (!postDto.getPublishAt().isAfter(LocalDateTime.now())) {
+                throw new ApiException("publishAt must be in the future");
+            }
+            post.setStatus(PostStatus.DRAFT);
+        }
         post.setImageName(postDto.getImageName() == null ? "default.png" : postDto.getImageName());
         post.setAddDate(new Date(System.currentTimeMillis()));
         post.setUser(user);

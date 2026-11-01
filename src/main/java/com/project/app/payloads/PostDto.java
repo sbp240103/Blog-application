@@ -40,6 +40,9 @@ public class PostDto {
     // DRAFT or PUBLISHED, a new post is published unless DRAFT is sent
     private PostStatus status;
 
+    // future time to publish a draft automatically
+    private LocalDateTime publishAt;
+
     private Set<CommentDto> comments = new HashSet<>();
 
     // e.g. ["java", "spring"], tags are created on first use.
