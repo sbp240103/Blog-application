@@ -17,6 +17,7 @@ public interface PostService {
     PostDto unpublishPost(Integer postId);
     PostDto uploadPostImage(Integer postId, MultipartFile image) throws IOException;
     PostDto getPostById(Integer postId);
+    PostDto getPostBySlug(String slug);
     PageResponse<PostDto> getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection);
     PageResponse<PostDto> getPostsByUser(Integer userId, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection);
     PageResponse<PostDto> getPostsByCategory(Integer categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection);

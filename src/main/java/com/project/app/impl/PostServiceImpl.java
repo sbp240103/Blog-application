@@ -39,6 +39,7 @@ import com.project.app.config.AppConstants;
 import com.project.app.entities.PostStatus;
 import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
+import com.project.app.utils.SlugUtil;
 
 @Service 
 public class PostServiceImpl implements PostService {
@@ -85,6 +86,7 @@ public class PostServiceImpl implements PostService {
         Post post = this.modelMapper.map(postDto, Post.class);
         post.setPostId(null);
         post.setViewCount(0);
+        post.setSlug(this.uniqueSlug(postDto.getTitle()));
         post.setStatus(postDto.getStatus() == null ? PostStatus.PUBLISHED : postDto.getStatus());
 
         // a scheduled post stays a draft until the scheduler publishes it
@@ -112,6 +114,9 @@ public class PostServiceImpl implements PostService {
 
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
+        if (post.getSlug() == null) {
+            post.setSlug(this.uniqueSlug(postDto.getTitle()));
+        }
         if (postDto.getImageName() != null) {
             post.setImageName(postDto.getImageName());
         }
@@ -173,6 +178,17 @@ public class PostServiceImpl implements PostService {
         return this.postMapper.toDto(updatedPost);
     }
 
+    // adds -2, -3 ... until the slug is not taken by another post
+    private String uniqueSlug(String title) {
+        String base = SlugUtil.toSlug(title);
+        String slug = base;
+        int counter = 2;
+        while (this.postRepo.existsBySlug(slug)) {
+            slug = base + "-" + counter++;
+        }
+        return slug;
+    }
+
     // turns tag names into tag entities, reusing existing tags and creating new ones
     private Set<Tag> resolveTags(Set<String> tagNames) {
         Set<Tag> tags = new HashSet<>();
@@ -221,6 +237,13 @@ public class PostServiceImpl implements PostService {
         post.setViewCount(post.getViewCount() + 1);
 
         return this.postMapper.toDto(post);
+    }
+
+    // same rules as reading by id, drafts stay hidden
+    @Override
+    public PostDto getPostBySlug(String slug){
+        Post post = this.postRepo.findBySlug(slug).orElseThrow(()-> new ApiException("post not found : " + slug, HttpStatus.NOT_FOUND));
+        return this.getPostById(post.getPostId());
     }
 
     // getall

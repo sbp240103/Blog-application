@@ -21,6 +21,9 @@ public class PostDto {
 
     private Integer postId;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String slug;
+
     @NotEmpty(message = "post title should not be empty")
     @Size(min = 4, max = 100, message = "post title must be between 4 and 100 characters")
     private String title;

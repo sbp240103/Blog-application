@@ -54,6 +54,10 @@ public class Post {
     @Column (nullable = false, columnDefinition = "int default 0")
     private Integer viewCount = 0;
 
+    // readable unique url part, e.g. getting-started-with-spring
+    @Column (unique = true, length = 120)
+    private String slug;
+
     // existing rows become published so nothing disappears
     @Enumerated (EnumType.STRING)
     @Column (nullable = false, length = 20, columnDefinition = "varchar(20) default 'PUBLISHED'")

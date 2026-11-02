@@ -14,8 +14,13 @@ import com.project.app.entities.User;
 import com.project.app.entities.PostStatus;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface PostRepo extends JpaRepository<Post, Integer> {
+
+    Optional<Post> findBySlug(String slug);
+
+    boolean existsBySlug(String slug);
 
     Page<Post> findByUser(User user, Pageable pageable);
 

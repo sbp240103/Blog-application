@@ -97,6 +97,12 @@ public class PostController {
         return ResponseEntity.ok(this.postService.getPostById(postId));
     }
 
+    // get single post by its slug
+    @GetMapping("/posts/slug/{slug}")
+    public ResponseEntity<PostDto> getPostBySlug(@PathVariable("slug") String slug){
+        return ResponseEntity.ok(this.postService.getPostBySlug(slug));
+    }
+
     // get posts by user
     @GetMapping("/user/{userId}/posts")
     public ResponseEntity<PageResponse<PostDto>> getPostsByUser(
