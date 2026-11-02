@@ -60,6 +60,14 @@ public class PostDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private long commentCount;
 
+    // estimated at 200 words per minute
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private int readingTimeMinutes;
+
+    // short preview of the content for listing pages
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String excerpt;
+
     // only filled for logged in viewers, false for anonymous requests
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private boolean likedByMe;
