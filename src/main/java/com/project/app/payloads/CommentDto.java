@@ -27,4 +27,8 @@ public class CommentDto {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime createdAt;
+
+    // id of the comment this one replies to, null for top level comments
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Integer parentId;
 }

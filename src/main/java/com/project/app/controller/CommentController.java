@@ -40,6 +40,18 @@ public class CommentController {
         return ResponseEntity.ok(this.commentService.getCommentsByPost(postId));
     }
 
+    // reply to a comment
+    @PostMapping ("/comments/{commentId}/replies")
+    public ResponseEntity<CommentDto> createReply(@Valid @RequestBody CommentDto commentDto, @PathVariable("commentId") Integer commentId) {
+        return new ResponseEntity<>(this.commentService.createReply(commentDto, commentId), HttpStatus.CREATED);
+    }
+
+    // replies of a comment
+    @GetMapping ("/comments/{commentId}/replies")
+    public ResponseEntity<List<CommentDto>> getReplies(@PathVariable("commentId") Integer commentId) {
+        return ResponseEntity.ok(this.commentService.getReplies(commentId));
+    }
+
     // update comment
     @PutMapping ("/comments/{commentId}")
     public ResponseEntity<CommentDto> updateComment(@Valid @RequestBody CommentDto commentDto, @PathVariable("commentId") Integer commentId) {

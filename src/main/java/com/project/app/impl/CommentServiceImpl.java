@@ -38,12 +38,37 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto createComment(CommentDto commentDto, Integer postId) {
         Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "post id", postId));
 
-        Comments comment = this.modelMapper.map(commentDto, Comments.class);
+        Comments comment = new Comments();
+        comment.setContent(commentDto.getContent());
         comment.setPost(post);
         comment.setUser(this.authUtil.getLoggedInUser());
 
         Comments savedComment = this.commentRepo.save(comment);
         return this.modelMapper.map(savedComment, CommentDto.class);
+    }
+
+    // replying to a reply attaches to the top level comment so threads stay one level deep
+    @Override
+    public CommentDto createReply(CommentDto commentDto, Integer commentId) {
+        Comments target = this.commentRepo.findById(commentId).orElseThrow(()-> new ResouceNotFoundException("Comment", "comment id", commentId));
+        Comments parent = target.getParent() != null ? target.getParent() : target;
+
+        Comments reply = new Comments();
+        reply.setContent(commentDto.getContent());
+        reply.setPost(parent.getPost());
+        reply.setParent(parent);
+        reply.setUser(this.authUtil.getLoggedInUser());
+
+        return this.modelMapper.map(this.commentRepo.save(reply), CommentDto.class);
+    }
+
+    // replies of a comment, oldest first
+    @Override
+    public List<CommentDto> getReplies(Integer commentId) {
+        Comments parent = this.commentRepo.findById(commentId).orElseThrow(()-> new ResouceNotFoundException("Comment", "comment id", commentId));
+        return this.commentRepo.findByParentOrderByIdAsc(parent).stream()
+                .map(reply -> this.modelMapper.map(reply, CommentDto.class))
+                .collect(Collectors.toList());
     }
 
     // only the author can edit a comment

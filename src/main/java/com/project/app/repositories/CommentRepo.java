@@ -14,6 +14,8 @@ public interface CommentRepo extends JpaRepository<Comments, Integer> {
 
     long countByPost(Post post);
 
+    List<Comments> findByParentOrderByIdAsc(Comments parent);
+
     void deleteByUser(User user);
 
 }

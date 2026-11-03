@@ -13,6 +13,10 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.HashSet;
+import java.util.Set;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToMany;
 
 @Entity
 @Table (name = "comments")
@@ -36,5 +40,13 @@ public class Comments {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    // set when this comment is a reply, only one level of nesting is used
+    @ManyToOne
+    private Comments parent;
+
+    // replies are removed together with the comment they answer
+    @OneToMany (mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comments> replies = new HashSet<>();
 
 }
