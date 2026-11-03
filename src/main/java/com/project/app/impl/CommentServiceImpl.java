@@ -17,6 +17,9 @@ import com.project.app.repositories.CommentRepo;
 import com.project.app.repositories.PostRepo;
 import com.project.app.security.AuthUtil;
 import com.project.app.services.CommentService;
+import org.springframework.data.domain.Page;
+import com.project.app.payloads.PageResponse;
+import com.project.app.utils.PageUtil;
 
 @Service 
 public class CommentServiceImpl implements CommentService {
@@ -86,13 +89,18 @@ public class CommentServiceImpl implements CommentService {
         return this.modelMapper.map(updatedComment, CommentDto.class);
     }
 
-    // all comments of a post, oldest first
+    // top level comments of a post, oldest first, replies are fetched separately
     @Override
-    public List<CommentDto> getCommentsByPost(Integer postId) {
+    public PageResponse<CommentDto> getCommentsByPost(Integer postId, Integer pageNumber, Integer pageSize) {
         Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "post id", postId));
-        return this.commentRepo.findByPostOrderByIdAsc(post).stream()
-                .map(comment -> this.modelMapper.map(comment, CommentDto.class))
-                .collect(Collectors.toList());
+        Page<Comments> page = this.commentRepo.findByPostAndParentIsNull(post, PageUtil.build(pageNumber, pageSize, "Id", "asc"));
+        return PageResponse.of(page, this::toDtoWithReplyCount);
+    }
+
+    private CommentDto toDtoWithReplyCount(Comments comment) {
+        CommentDto dto = this.modelMapper.map(comment, CommentDto.class);
+        dto.setReplyCount(this.commentRepo.countByParent(comment));
+        return dto;
     }
 
     // delete

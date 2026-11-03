@@ -3,6 +3,7 @@ package com.project.app.services;
 import java.util.List;
 
 import com.project.app.payloads.CommentDto;
+import com.project.app.payloads.PageResponse;
 
 public interface CommentService {
 
@@ -16,5 +17,5 @@ public interface CommentService {
 
     void deleteComment(Integer commentId);
 
-    List<CommentDto> getCommentsByPost(Integer postId);
+    PageResponse<CommentDto> getCommentsByPost(Integer postId, Integer pageNumber, Integer pageSize);
 }

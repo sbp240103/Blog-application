@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.project.app.entities.Comments;
 import com.project.app.entities.Post;
 import com.project.app.entities.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CommentRepo extends JpaRepository<Comments, Integer> {
 
@@ -15,6 +17,10 @@ public interface CommentRepo extends JpaRepository<Comments, Integer> {
     long countByPost(Post post);
 
     List<Comments> findByParentOrderByIdAsc(Comments parent);
+
+    Page<Comments> findByPostAndParentIsNull(Post post, Pageable pageable);
+
+    long countByParent(Comments parent);
 
     void deleteByUser(User user);
 

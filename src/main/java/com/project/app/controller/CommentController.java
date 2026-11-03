@@ -19,6 +19,9 @@ import com.project.app.payloads.CommentDto;
 import jakarta.validation.Valid;
 import com.project.app.services.CommentService;
 import com.project.app.payloads.ApiResponse;
+import org.springframework.web.bind.annotation.RequestParam;
+import com.project.app.config.AppConstants;
+import com.project.app.payloads.PageResponse;
 
 @RestController
 @RequestMapping("/api")
@@ -34,10 +37,14 @@ public class CommentController {
         return new ResponseEntity<>(createdComment, HttpStatus.CREATED);
     }
 
-    // all comments of a post
+    // top level comments of a post with reply counts
     @GetMapping ("/post/{postId}/comments")
-    public ResponseEntity<List<CommentDto>> getCommentsByPost(@PathVariable("postId") Integer postId) {
-        return ResponseEntity.ok(this.commentService.getCommentsByPost(postId));
+    public ResponseEntity<PageResponse<CommentDto>> getCommentsByPost(
+        @PathVariable("postId") Integer postId,
+        @RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+        @RequestParam(value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize
+    ) {
+        return ResponseEntity.ok(this.commentService.getCommentsByPost(postId, pageNumber, pageSize));
     }
 
     // reply to a comment

@@ -31,4 +31,7 @@ public class CommentDto {
     // id of the comment this one replies to, null for top level comments
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer parentId;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private long replyCount;
 }
