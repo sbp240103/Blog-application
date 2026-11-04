@@ -18,6 +18,8 @@ import com.project.app.repositories.UserRepo;
 import com.project.app.security.AuthUtil;
 import com.project.app.services.FollowService;
 import com.project.app.utils.PageUtil;
+import com.project.app.entities.NotificationType;
+import com.project.app.services.NotificationService;
 
 @Service
 public class FollowServiceImpl implements FollowService {
@@ -30,6 +32,9 @@ public class FollowServiceImpl implements FollowService {
 
     @Autowired
     private AuthUtil authUtil;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -46,6 +51,7 @@ public class FollowServiceImpl implements FollowService {
             throw new ApiException("you already follow this user", HttpStatus.CONFLICT);
         }
         this.followRepo.save(new Follow(me, target));
+        this.notificationService.notify(target, me, NotificationType.FOLLOW, null, me.getName() + " started following you");
     }
 
     @Override

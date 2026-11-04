@@ -18,6 +18,8 @@ import com.project.app.repositories.PostRepo;
 import com.project.app.security.AuthUtil;
 import com.project.app.services.LikeService;
 import com.project.app.utils.PageUtil;
+import com.project.app.entities.NotificationType;
+import com.project.app.services.NotificationService;
 
 @Service
 public class LikeServiceImpl implements LikeService {
@@ -32,6 +34,9 @@ public class LikeServiceImpl implements LikeService {
     private AuthUtil authUtil;
 
     @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
     private ModelMapper modelMapper;
 
     @Override
@@ -43,6 +48,8 @@ public class LikeServiceImpl implements LikeService {
             throw new ApiException("you have already liked this post", HttpStatus.CONFLICT);
         }
         this.postLikeRepo.save(new PostLike(user, post));
+        this.notificationService.notify(post.getUser(), user, NotificationType.LIKE, post.getPostId(),
+                user.getName() + " liked your post \"" + post.getTitle() + "\"");
     }
 
     @Override

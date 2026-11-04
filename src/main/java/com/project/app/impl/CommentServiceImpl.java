@@ -20,6 +20,8 @@ import com.project.app.services.CommentService;
 import org.springframework.data.domain.Page;
 import com.project.app.payloads.PageResponse;
 import com.project.app.utils.PageUtil;
+import com.project.app.entities.NotificationType;
+import com.project.app.services.NotificationService;
 
 @Service 
 public class CommentServiceImpl implements CommentService {
@@ -36,6 +38,9 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private AuthUtil authUtil;
 
+    @Autowired
+    private NotificationService notificationService;
+
     // create
     @Override
     public CommentDto createComment(CommentDto commentDto, Integer postId) {
@@ -47,6 +52,8 @@ public class CommentServiceImpl implements CommentService {
         comment.setUser(this.authUtil.getLoggedInUser());
 
         Comments savedComment = this.commentRepo.save(comment);
+        this.notificationService.notify(post.getUser(), savedComment.getUser(), NotificationType.COMMENT, post.getPostId(),
+                savedComment.getUser().getName() + " commented on your post \"" + post.getTitle() + "\"");
         return this.modelMapper.map(savedComment, CommentDto.class);
     }
 
@@ -62,7 +69,10 @@ public class CommentServiceImpl implements CommentService {
         reply.setParent(parent);
         reply.setUser(this.authUtil.getLoggedInUser());
 
-        return this.modelMapper.map(this.commentRepo.save(reply), CommentDto.class);
+        Comments savedReply = this.commentRepo.save(reply);
+        this.notificationService.notify(parent.getUser(), savedReply.getUser(), NotificationType.REPLY, parent.getPost().getPostId(),
+                savedReply.getUser().getName() + " replied to your comment");
+        return this.modelMapper.map(savedReply, CommentDto.class);
     }
 
     // replies of a comment, oldest first
