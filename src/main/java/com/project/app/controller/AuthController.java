@@ -24,6 +24,9 @@ import com.project.app.security.JwtTokenHelper;
 import com.project.app.services.UserService;
 
 import jakarta.validation.Valid;
+import com.project.app.entities.RefreshToken;
+import com.project.app.payloads.RefreshTokenRequest;
+import com.project.app.services.RefreshTokenService;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -47,6 +50,9 @@ public class AuthController {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private RefreshTokenService refreshTokenService;
+
     // login and hand back a token along with the logged in user
     @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> createToken(@Valid @RequestBody JwtAuthRequest request) {
@@ -59,7 +65,21 @@ public class AuthController {
         User user = this.userRepo.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResouceNotFoundException("User", "email", 0));
 
-        return new ResponseEntity<>(new JwtAuthResponse(token, this.modelMapper.map(user, UserDto.class)), HttpStatus.OK);
+        String refreshToken = this.refreshTokenService.createRefreshToken(user).getToken();
+
+        return new ResponseEntity<>(new JwtAuthResponse(token, refreshToken, this.modelMapper.map(user, UserDto.class)), HttpStatus.OK);
+    }
+
+    // trade a valid refresh token for a fresh access token
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtAuthResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        RefreshToken refreshToken = this.refreshTokenService.verify(request.getRefreshToken());
+        User user = refreshToken.getUser();
+
+        UserDetails userDetails = this.userDetailsService.loadUserByUsername(user.getEmail());
+        String token = this.jwtTokenHelper.generateToken(userDetails);
+
+        return ResponseEntity.ok(new JwtAuthResponse(token, refreshToken.getToken(), this.modelMapper.map(user, UserDto.class)));
     }
 
     // register a new account, every new account gets the normal user role
