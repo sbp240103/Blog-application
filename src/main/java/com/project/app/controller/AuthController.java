@@ -27,6 +27,7 @@ import jakarta.validation.Valid;
 import com.project.app.entities.RefreshToken;
 import com.project.app.payloads.RefreshTokenRequest;
 import com.project.app.services.RefreshTokenService;
+import com.project.app.payloads.ApiResponse;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -73,13 +74,20 @@ public class AuthController {
     // trade a valid refresh token for a fresh access token
     @PostMapping("/refresh")
     public ResponseEntity<JwtAuthResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
-        RefreshToken refreshToken = this.refreshTokenService.verify(request.getRefreshToken());
+        RefreshToken refreshToken = this.refreshTokenService.rotate(this.refreshTokenService.verify(request.getRefreshToken()));
         User user = refreshToken.getUser();
 
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(user.getEmail());
         String token = this.jwtTokenHelper.generateToken(userDetails);
 
         return ResponseEntity.ok(new JwtAuthResponse(token, refreshToken.getToken(), this.modelMapper.map(user, UserDto.class)));
+    }
+
+    // logout revokes the refresh token, the short lived access token simply expires
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse> logout(@Valid @RequestBody RefreshTokenRequest request) {
+        this.refreshTokenService.revoke(request.getRefreshToken());
+        return ResponseEntity.ok(new ApiResponse("logged out successfully", true));
     }
 
     // register a new account, every new account gets the normal user role

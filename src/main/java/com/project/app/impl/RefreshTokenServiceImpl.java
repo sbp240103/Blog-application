@@ -44,4 +44,18 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return refreshToken;
     }
 
+    // every refresh hands out a new refresh token and burns the old one,
+    // so a stolen token can only be used once
+    @Override
+    public RefreshToken rotate(RefreshToken current) {
+        User user = current.getUser();
+        this.refreshTokenRepo.delete(current);
+        return this.createRefreshToken(user);
+    }
+
+    @Override
+    public void revoke(String token) {
+        this.refreshTokenRepo.findByToken(token).ifPresent(this.refreshTokenRepo::delete);
+    }
+
 }
