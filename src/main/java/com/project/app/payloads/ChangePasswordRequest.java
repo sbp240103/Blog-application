@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import com.project.app.validation.StrongPassword;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,6 +19,7 @@ public class ChangePasswordRequest {
 
     @NotEmpty(message = "new password should not be empty")
     @Size(min = 6, max = 15, message = "new password must be between 6 and 15 characters")
+    @StrongPassword
     private String newPassword;
 
 }
