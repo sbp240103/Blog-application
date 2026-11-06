@@ -11,4 +11,8 @@ public interface AdminService {
 
     StatsDto getStats();
 
+    void banUser(Integer userId);
+
+    void unbanUser(Integer userId);
+
 }

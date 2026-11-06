@@ -79,6 +79,8 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = this.dtoToUser(userDto);
+        user.setEnabled(true);
+        user.setFailedLoginAttempts(0);
         user.setPassword(this.passwordEncoder.encode(userDto.getPassword()));
 
         Role role = this.roleRepo.findById(AppConstants.NORMAL_USER)

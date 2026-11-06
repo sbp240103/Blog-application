@@ -50,6 +50,10 @@ public class User {
 
     private LocalDateTime lockedUntil;
 
+    // an admin can ban an account, existing rows stay enabled
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private Boolean enabled = true;
+
     @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Post> posts = new ArrayList<>();
 

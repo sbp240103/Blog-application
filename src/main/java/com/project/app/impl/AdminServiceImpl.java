@@ -23,6 +23,8 @@ import com.project.app.repositories.TagRepo;
 import com.project.app.repositories.UserRepo;
 import com.project.app.security.AuthUtil;
 import com.project.app.services.AdminService;
+import com.project.app.repositories.RefreshTokenRepo;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -59,6 +61,9 @@ public class AdminServiceImpl implements AdminService {
 
     @Autowired
     private FollowRepo followRepo;
+
+    @Autowired
+    private RefreshTokenRepo refreshTokenRepo;
 
     @Override
     public UserDto promoteToAdmin(Integer userId) {
@@ -99,6 +104,32 @@ public class AdminServiceImpl implements AdminService {
                 this.postLikeRepo.count(),
                 this.bookmarkRepo.count(),
                 this.followRepo.count());
+    }
+
+    // a banned user can not login and their refresh tokens stop working right away
+    @Override
+    @Transactional
+    public void banUser(Integer userId) {
+        User user = this.userRepo.findById(userId).orElseThrow(() -> new ResouceNotFoundException("User", "Id", userId));
+        if (this.authUtil.getLoggedInUser().getId() == user.getId()) {
+            throw new ApiException("you can not ban yourself");
+        }
+        if (Boolean.FALSE.equals(user.getEnabled())) {
+            throw new ApiException("user is already banned", HttpStatus.CONFLICT);
+        }
+        user.setEnabled(false);
+        this.userRepo.save(user);
+        this.refreshTokenRepo.deleteByUser(user);
+    }
+
+    @Override
+    public void unbanUser(Integer userId) {
+        User user = this.userRepo.findById(userId).orElseThrow(() -> new ResouceNotFoundException("User", "Id", userId));
+        if (Boolean.TRUE.equals(user.getEnabled())) {
+            throw new ApiException("user is not banned", HttpStatus.CONFLICT);
+        }
+        user.setEnabled(true);
+        this.userRepo.save(user);
     }
 
     private Role adminRole() {

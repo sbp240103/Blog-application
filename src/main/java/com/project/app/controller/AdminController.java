@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.project.app.payloads.StatsDto;
 import com.project.app.payloads.UserDto;
 import com.project.app.services.AdminService;
+import com.project.app.payloads.ApiResponse;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -25,6 +26,19 @@ public class AdminController {
     @GetMapping("/stats")
     public ResponseEntity<StatsDto> getStats() {
         return ResponseEntity.ok(this.adminService.getStats());
+    }
+
+    // stop a user from logging in
+    @PutMapping("/users/{userId}/ban")
+    public ResponseEntity<ApiResponse> banUser(@PathVariable("userId") Integer userId) {
+        this.adminService.banUser(userId);
+        return ResponseEntity.ok(new ApiResponse("user banned", true));
+    }
+
+    @PutMapping("/users/{userId}/unban")
+    public ResponseEntity<ApiResponse> unbanUser(@PathVariable("userId") Integer userId) {
+        this.adminService.unbanUser(userId);
+        return ResponseEntity.ok(new ApiResponse("user unbanned", true));
     }
 
     // give a user the admin role
