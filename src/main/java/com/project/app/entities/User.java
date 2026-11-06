@@ -22,6 +22,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name="users")
@@ -42,6 +43,12 @@ public class User {
     private String password;
 
     private String about;
+
+    // brute force protection, the account is locked for a while after too many wrong passwords
+    @Column(nullable = false, columnDefinition = "int default 0")
+    private Integer failedLoginAttempts = 0;
+
+    private LocalDateTime lockedUntil;
 
     @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Post> posts = new ArrayList<>();

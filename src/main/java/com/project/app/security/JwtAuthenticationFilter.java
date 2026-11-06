@@ -48,7 +48,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-                if (this.jwtTokenHelper.validateToken(token, userDetails)) {
+                // locked or banned accounts can not use tokens issued earlier
+                if (userDetails.isAccountNonLocked() && userDetails.isEnabled()
+                        && this.jwtTokenHelper.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

@@ -28,6 +28,7 @@ import com.project.app.entities.RefreshToken;
 import com.project.app.payloads.RefreshTokenRequest;
 import com.project.app.services.RefreshTokenService;
 import com.project.app.payloads.ApiResponse;
+import com.project.app.services.LoginAttemptService;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -53,6 +54,9 @@ public class AuthController {
 
     @Autowired
     private RefreshTokenService refreshTokenService;
+
+    @Autowired
+    private LoginAttemptService loginAttemptService;
 
     // login and hand back a token along with the logged in user
     @PostMapping("/login")
@@ -104,8 +108,10 @@ public class AuthController {
         try {
             this.authenticationManager.authenticate(authenticationToken);
         } catch (BadCredentialsException e) {
+            this.loginAttemptService.loginFailed(email);
             throw new BadCredentialsException("invalid email or password");
         }
+        this.loginAttemptService.loginSucceeded(email);
     }
 
 }

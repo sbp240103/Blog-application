@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.project.app.payloads.ApiResponse;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.authentication.LockedException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -47,6 +48,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponse> badCredentialsExceptionHandler(BadCredentialsException ex) {
         return new ResponseEntity<>(new ApiResponse("invalid email or password", false), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<ApiResponse> lockedExceptionHandler(LockedException ex) {
+        return new ResponseEntity<>(new ApiResponse("account is locked because of too many failed logins, try again later", false), HttpStatus.LOCKED);
     }
 
     @ExceptionHandler(AccessDeniedException.class)

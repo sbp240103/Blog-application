@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.project.app.entities.User;
 import com.project.app.repositories.UserRepo;
+import java.time.LocalDateTime;
 
 @Service
 public class CustomUserDetailService implements UserDetailsService {
@@ -26,6 +27,7 @@ public class CustomUserDetailService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
                 .password(user.getPassword())
+                .accountLocked(user.getLockedUntil() != null && user.getLockedUntil().isAfter(LocalDateTime.now()))
                 .authorities(user.getRoles().stream()
                         .map(role -> new SimpleGrantedAuthority(role.getName()))
                         .collect(Collectors.toList()))
