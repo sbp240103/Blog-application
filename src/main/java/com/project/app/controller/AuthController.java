@@ -29,6 +29,9 @@ import com.project.app.payloads.RefreshTokenRequest;
 import com.project.app.services.RefreshTokenService;
 import com.project.app.payloads.ApiResponse;
 import com.project.app.services.LoginAttemptService;
+import com.project.app.payloads.ForgotPasswordRequest;
+import com.project.app.payloads.ResetPasswordRequest;
+import com.project.app.services.PasswordResetService;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -57,6 +60,9 @@ public class AuthController {
 
     @Autowired
     private LoginAttemptService loginAttemptService;
+
+    @Autowired
+    private PasswordResetService passwordResetService;
 
     // login and hand back a token along with the logged in user
     @PostMapping("/login")
@@ -92,6 +98,19 @@ public class AuthController {
     public ResponseEntity<ApiResponse> logout(@Valid @RequestBody RefreshTokenRequest request) {
         this.refreshTokenService.revoke(request.getRefreshToken());
         return ResponseEntity.ok(new ApiResponse("logged out successfully", true));
+    }
+
+    // always answers the same way so it does not reveal which emails are registered
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        this.passwordResetService.requestReset(request.getEmail());
+        return ResponseEntity.ok(new ApiResponse("if the email is registered, a reset link has been sent", true));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        this.passwordResetService.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok(new ApiResponse("password has been reset, please login", true));
     }
 
     // register a new account, every new account gets the normal user role

@@ -29,6 +29,7 @@ import com.project.app.exceptions.ResouceNotFoundException;
 import com.project.app.payloads.UpdateProfileRequest;
 import com.project.app.repositories.NotificationRepo;
 import com.project.app.repositories.RefreshTokenRepo;
+import com.project.app.repositories.PasswordResetTokenRepo;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -65,6 +66,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RefreshTokenRepo refreshTokenRepo;
+
+    @Autowired
+    private PasswordResetTokenRepo passwordResetTokenRepo;
 
     @Override
     public UserDto registerNewUser(UserDto userDto) {
@@ -179,6 +183,7 @@ public class UserServiceImpl implements UserService {
         this.followRepo.deleteByFollowerOrFollowing(user, user);
         this.notificationRepo.deleteByRecipientOrActor(user, user);
         this.refreshTokenRepo.deleteByUser(user);
+        this.passwordResetTokenRepo.deleteByUser(user);
 
         this.userRepo.delete(user);
     }
