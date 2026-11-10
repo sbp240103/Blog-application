@@ -38,6 +38,9 @@ public class UserDto {
     @NotEmpty(message = "about should not be empty")
     private String about;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String avatarImage;
+
     // roles are managed by admins, never accepted from the request body
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Set<RoleDto> roles = new HashSet<>();

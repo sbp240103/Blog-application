@@ -30,6 +30,10 @@ import com.project.app.payloads.UpdateProfileRequest;
 import com.project.app.repositories.NotificationRepo;
 import com.project.app.repositories.RefreshTokenRepo;
 import com.project.app.repositories.PasswordResetTokenRepo;
+import java.io.IOException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.multipart.MultipartFile;
+import com.project.app.services.FileService;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -69,6 +73,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordResetTokenRepo passwordResetTokenRepo;
+
+    @Autowired
+    private FileService fileService;
+
+    @Value("${project.image}")
+    private String imagePath;
 
     @Override
     public UserDto registerNewUser(UserDto userDto) {
@@ -150,6 +160,19 @@ public class UserServiceImpl implements UserService {
         return this.userToDto(this.userRepo.save(user));
     }
 
+    // replaces the profile picture and removes the old file
+    @Override
+    public UserDto uploadAvatar(MultipartFile image) throws IOException {
+        User user = this.authUtil.getLoggedInUser();
+        String oldAvatar = user.getAvatarImage();
+
+        user.setAvatarImage(this.fileService.uploadImage(this.imagePath, image));
+        User savedUser = this.userRepo.save(user);
+
+        this.fileService.deleteImage(this.imagePath, oldAvatar);
+        return this.userToDto(savedUser);
+    }
+
     @Override
     public void changePassword(ChangePasswordRequest request) {
         User user = this.authUtil.getLoggedInUser();
@@ -185,7 +208,9 @@ public class UserServiceImpl implements UserService {
         this.refreshTokenRepo.deleteByUser(user);
         this.passwordResetTokenRepo.deleteByUser(user);
 
+        String avatar = user.getAvatarImage();
         this.userRepo.delete(user);
+        this.fileService.deleteImage(this.imagePath, avatar);
     }
 
     public  User dtoToUser(UserDto userDto){

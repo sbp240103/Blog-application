@@ -44,6 +44,9 @@ public class User {
 
     private String about;
 
+    // file name of the profile picture inside the images folder
+    private String avatarImage;
+
     // brute force protection, the account is locked for a while after too many wrong passwords
     @Column(nullable = false, columnDefinition = "int default 0")
     private Integer failedLoginAttempts = 0;

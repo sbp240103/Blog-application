@@ -23,6 +23,14 @@ import com.project.app.services.UserService;
 import com.project.app.payloads.ApiResponse;
 import org.springframework.web.bind.annotation.PatchMapping;
 import com.project.app.payloads.UpdateProfileRequest;
+import java.io.IOException;
+import java.io.InputStream;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.util.StreamUtils;
+import org.springframework.web.multipart.MultipartFile;
+import com.project.app.services.FileService;
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/users")
@@ -30,6 +38,12 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private FileService fileService;
+
+    @Value("${project.image}")
+    private String imagePath;
 
     // create user
     @PostMapping
@@ -75,6 +89,22 @@ public class UserController {
     @PatchMapping("/me")
     public ResponseEntity<UserDto> updateProfile(@Valid @RequestBody UpdateProfileRequest request){
         return ResponseEntity.ok(this.userService.updateProfile(request));
+    }
+
+    // upload a profile picture, multipart field name is image
+    @PostMapping("/me/avatar")
+    public ResponseEntity<UserDto> uploadAvatar(@RequestParam("image") MultipartFile image) throws IOException {
+        return ResponseEntity.ok(this.userService.uploadAvatar(image));
+    }
+
+    // serve a profile picture
+    @GetMapping("/avatar/{imageName}")
+    public void downloadAvatar(@PathVariable("imageName") String imageName, HttpServletResponse response) throws IOException {
+        try (InputStream resource = this.fileService.getResource(this.imagePath, imageName)) {
+            boolean isPng = imageName.toLowerCase().endsWith(".png");
+            response.setContentType(isPng ? MediaType.IMAGE_PNG_VALUE : MediaType.IMAGE_JPEG_VALUE);
+            StreamUtils.copy(resource, response.getOutputStream());
+        }
     }
 
     // change password of the logged in user
