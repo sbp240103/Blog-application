@@ -18,6 +18,9 @@ public interface PostLikeRepo extends JpaRepository<PostLike, Integer> {
 
     long countByPost(Post post);
 
+    // likes on all posts written by a user
+    long countByPostUser(User user);
+
     Page<PostLike> findByPost(Post post, Pageable pageable);
 
     void deleteByUser(User user);

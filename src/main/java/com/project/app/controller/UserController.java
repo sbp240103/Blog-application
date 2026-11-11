@@ -31,6 +31,7 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.project.app.services.FileService;
 import jakarta.servlet.http.HttpServletResponse;
+import com.project.app.payloads.ProfileDto;
 
 @RestController
 @RequestMapping("/api/users")
@@ -112,6 +113,12 @@ public class UserController {
     public ResponseEntity<ApiResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request){
         this.userService.changePassword(request);
         return ResponseEntity.ok(new ApiResponse("password changed successfully", true));
+    }
+
+    // public profile with post, follower and like counts
+    @GetMapping("/{userId}/profile")
+    public ResponseEntity<ProfileDto> getProfile(@PathVariable("userId") Integer userId){
+        return ResponseEntity.ok(this.userService.getProfile(userId));
     }
 
     @GetMapping("/{userId}")

@@ -28,6 +28,8 @@ public interface PostRepo extends JpaRepository<Post, Integer> {
 
     Page<Post> findByStatus(PostStatus status, Pageable pageable);
 
+    long countByUserAndStatus(User user, PostStatus status);
+
     List<Post> findByStatusAndPublishAtLessThanEqual(PostStatus status, LocalDateTime time);
 
     Page<Post> findByCategoryAndStatus(Category category, PostStatus status, Pageable pageable);

@@ -6,6 +6,7 @@ import com.project.app.payloads.UserDto;
 import com.project.app.payloads.UpdateProfileRequest;
 import java.io.IOException;
 import org.springframework.web.multipart.MultipartFile;
+import com.project.app.payloads.ProfileDto;
 
 public interface UserService {
 
@@ -14,6 +15,7 @@ public interface UserService {
     UserDto updateUser(UserDto user, Integer userId);
     UserDto getUserById(Integer userId);
     UserDto getCurrentUser();
+    ProfileDto getProfile(Integer userId);
     void changePassword(ChangePasswordRequest request);
     UserDto updateProfile(UpdateProfileRequest request);
     UserDto uploadAvatar(MultipartFile image) throws IOException;

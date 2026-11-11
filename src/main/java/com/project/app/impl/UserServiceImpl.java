@@ -34,6 +34,9 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 import com.project.app.services.FileService;
+import com.project.app.entities.PostStatus;
+import com.project.app.payloads.ProfileDto;
+import com.project.app.repositories.PostRepo;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -76,6 +79,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private FileService fileService;
+
+    @Autowired
+    private PostRepo postRepo;
 
     @Value("${project.image}")
     private String imagePath;
@@ -136,6 +142,17 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserById(Integer userId) {
         User user = this.userRepo.findById(userId).orElseThrow(()-> new ResouceNotFoundException("User", "Id", userId));
         return this.userToDto(user);
+    }
+
+    @Override
+    public ProfileDto getProfile(Integer userId) {
+        User user = this.userRepo.findById(userId).orElseThrow(()-> new ResouceNotFoundException("User", "Id", userId));
+        return new ProfileDto(
+                this.userToDto(user),
+                this.postRepo.countByUserAndStatus(user, PostStatus.PUBLISHED),
+                this.followRepo.countByFollowing(user),
+                this.followRepo.countByFollower(user),
+                this.postLikeRepo.countByPostUser(user));
     }
 
     @Override
