@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.project.app.services.FileService;
 import jakarta.servlet.http.HttpServletResponse;
 import com.project.app.payloads.ProfileDto;
+import com.project.app.payloads.MyStatsDto;
 
 @RestController
 @RequestMapping("/api/users")
@@ -94,6 +95,12 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(){
         return ResponseEntity.ok(this.userService.getCurrentUser());
+    }
+
+    // personal dashboard numbers
+    @GetMapping("/me/stats")
+    public ResponseEntity<MyStatsDto> getMyStats(){
+        return ResponseEntity.ok(this.userService.getMyStats());
     }
 
     // update name or about of the logged in user without resending the password

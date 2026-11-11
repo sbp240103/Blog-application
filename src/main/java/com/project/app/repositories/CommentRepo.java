@@ -16,6 +16,9 @@ public interface CommentRepo extends JpaRepository<Comments, Integer> {
 
     long countByPost(Post post);
 
+    // comments written on any post of the given user
+    long countByPostUser(User user);
+
     List<Comments> findByParentOrderByIdAsc(Comments parent);
 
     Page<Comments> findByPostAndParentIsNull(Post post, Pageable pageable);

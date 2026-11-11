@@ -37,6 +37,7 @@ import com.project.app.services.FileService;
 import com.project.app.entities.PostStatus;
 import com.project.app.payloads.ProfileDto;
 import com.project.app.repositories.PostRepo;
+import com.project.app.payloads.MyStatsDto;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -163,6 +164,20 @@ public class UserServiceImpl implements UserService {
         }
         Page<User> page = this.userRepo.findByNameContainingIgnoreCase(keyword.trim(), PageUtil.build(pageNumber, pageSize, "name", "asc"));
         return PageResponse.of(page, this::userToDto);
+    }
+
+    @Override
+    public MyStatsDto getMyStats() {
+        User me = this.authUtil.getLoggedInUser();
+        return new MyStatsDto(
+                this.postRepo.countByUserAndStatus(me, PostStatus.PUBLISHED),
+                this.postRepo.countByUserAndStatus(me, PostStatus.DRAFT),
+                this.postRepo.sumViewsByUser(me),
+                this.postLikeRepo.countByPostUser(me),
+                this.commentRepo.countByPostUser(me),
+                this.followRepo.countByFollowing(me),
+                this.followRepo.countByFollower(me),
+                this.bookmarkRepo.countByUser(me));
     }
 
     @Override

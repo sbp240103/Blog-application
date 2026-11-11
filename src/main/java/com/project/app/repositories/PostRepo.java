@@ -30,6 +30,9 @@ public interface PostRepo extends JpaRepository<Post, Integer> {
 
     long countByUserAndStatus(User user, PostStatus status);
 
+    @Query ("select coalesce(sum(p.viewCount), 0) from Post p where p.user = :user")
+    long sumViewsByUser(@Param("user") User user);
+
     List<Post> findByStatusAndPublishAtLessThanEqual(PostStatus status, LocalDateTime time);
 
     Page<Post> findByCategoryAndStatus(Category category, PostStatus status, Pageable pageable);
