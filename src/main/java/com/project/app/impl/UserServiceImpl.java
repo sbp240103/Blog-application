@@ -155,6 +155,16 @@ public class UserServiceImpl implements UserService {
                 this.postLikeRepo.countByPostUser(user));
     }
 
+    // find people by name, used for the search box and mentions
+    @Override
+    public PageResponse<UserDto> searchUsers(String keyword, Integer pageNumber, Integer pageSize) {
+        if (keyword == null || keyword.trim().length() < 2) {
+            throw new ApiException("search keyword must have at least 2 characters");
+        }
+        Page<User> page = this.userRepo.findByNameContainingIgnoreCase(keyword.trim(), PageUtil.build(pageNumber, pageSize, "name", "asc"));
+        return PageResponse.of(page, this::userToDto);
+    }
+
     @Override
     public UserDto getCurrentUser() {
         return this.userToDto(this.authUtil.getLoggedInUser());

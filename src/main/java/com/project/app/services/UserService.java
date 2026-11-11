@@ -16,6 +16,7 @@ public interface UserService {
     UserDto getUserById(Integer userId);
     UserDto getCurrentUser();
     ProfileDto getProfile(Integer userId);
+    PageResponse<UserDto> searchUsers(String keyword, Integer pageNumber, Integer pageSize);
     void changePassword(ChangePasswordRequest request);
     UserDto updateProfile(UpdateProfileRequest request);
     UserDto uploadAvatar(MultipartFile image) throws IOException;

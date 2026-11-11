@@ -80,6 +80,16 @@ public class UserController {
         return ResponseEntity.ok(this.userService.getAllUsers(pageNumber, pageSize, sortBy, sortDirection));
     }
 
+    // search users by name
+    @GetMapping("/search")
+    public ResponseEntity<PageResponse<UserDto>> searchUsers(
+        @RequestParam (value = "keyword") String keyword,
+        @RequestParam (value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+        @RequestParam (value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize
+    ){
+        return ResponseEntity.ok(this.userService.searchUsers(keyword, pageNumber, pageSize));
+    }
+
     // currently logged in user
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(){
