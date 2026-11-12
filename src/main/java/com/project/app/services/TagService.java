@@ -8,4 +8,6 @@ public interface TagService {
 
     List<TagDto> getAllTags();
 
+    List<TagDto> getPopularTags(Integer limit);
+
 }

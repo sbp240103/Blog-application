@@ -15,4 +15,12 @@ public class TagDto {
 
     private String name;
 
+    // number of published posts using the tag, only filled for popular tags
+    private Long postCount;
+
+    public TagDto(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
 }

@@ -33,6 +33,14 @@ public class TagController {
         return ResponseEntity.ok(this.tagService.getAllTags());
     }
 
+    // most used tags with their post counts
+    @GetMapping("/popular")
+    public ResponseEntity<List<TagDto>> getPopularTags(
+        @RequestParam(value = "limit", defaultValue = "10", required = false) Integer limit
+    ) {
+        return ResponseEntity.ok(this.tagService.getPopularTags(limit));
+    }
+
     // posts having a tag
     @GetMapping("/{tagName}/posts")
     public ResponseEntity<PageResponse<PostDto>> getPostsByTag(
