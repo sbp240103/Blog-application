@@ -145,6 +145,15 @@ public class PostController {
         return ResponseEntity.ok(this.postService.getMyDrafts(pageNumber, pageSize));
     }
 
+    // posts picked by admins
+    @GetMapping("/posts/featured")
+    public ResponseEntity<PageResponse<PostDto>> getFeaturedPosts(
+        @RequestParam (value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+        @RequestParam (value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize
+    ){
+        return ResponseEntity.ok(this.postService.getFeaturedPosts(pageNumber, pageSize));
+    }
+
     // most viewed posts
     @GetMapping("/posts/trending")
     public ResponseEntity<List<PostDto>> getTrendingPosts(

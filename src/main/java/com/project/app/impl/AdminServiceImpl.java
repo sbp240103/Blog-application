@@ -25,6 +25,8 @@ import com.project.app.security.AuthUtil;
 import com.project.app.services.AdminService;
 import com.project.app.repositories.RefreshTokenRepo;
 import org.springframework.transaction.annotation.Transactional;
+import com.project.app.entities.Post;
+import com.project.app.entities.PostStatus;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -130,6 +132,16 @@ public class AdminServiceImpl implements AdminService {
         }
         user.setEnabled(true);
         this.userRepo.save(user);
+    }
+
+    @Override
+    public void setPostFeatured(Integer postId, boolean featured) {
+        Post post = this.postRepo.findById(postId).orElseThrow(() -> new ResouceNotFoundException("Post", "Id", postId));
+        if (featured && post.getStatus() != PostStatus.PUBLISHED) {
+            throw new ApiException("only published posts can be featured");
+        }
+        post.setFeatured(featured);
+        this.postRepo.save(post);
     }
 
     private Role adminRole() {

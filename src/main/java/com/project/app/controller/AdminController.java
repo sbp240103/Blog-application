@@ -41,6 +41,19 @@ public class AdminController {
         return ResponseEntity.ok(new ApiResponse("user unbanned", true));
     }
 
+    // show a post on the home page
+    @PutMapping("/posts/{postId}/feature")
+    public ResponseEntity<ApiResponse> featurePost(@PathVariable("postId") Integer postId) {
+        this.adminService.setPostFeatured(postId, true);
+        return ResponseEntity.ok(new ApiResponse("post featured", true));
+    }
+
+    @PutMapping("/posts/{postId}/unfeature")
+    public ResponseEntity<ApiResponse> unfeaturePost(@PathVariable("postId") Integer postId) {
+        this.adminService.setPostFeatured(postId, false);
+        return ResponseEntity.ok(new ApiResponse("post removed from featured", true));
+    }
+
     // give a user the admin role
     @PutMapping("/users/{userId}/promote")
     public ResponseEntity<UserDto> promoteToAdmin(@PathVariable("userId") Integer userId) {

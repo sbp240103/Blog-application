@@ -66,6 +66,10 @@ public class Post {
     // when set on a draft, the post is published automatically at this time
     private LocalDateTime publishAt;
 
+    // picked by an admin to show on the home page
+    @Column (nullable = false, columnDefinition = "boolean default false")
+    private Boolean featured = false;
+
     // last time the post content was changed, view count updates do not touch it
     @UpdateTimestamp
     private LocalDateTime updatedAt;

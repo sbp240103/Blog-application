@@ -46,6 +46,9 @@ public class PostDto {
     // future time to publish a draft automatically
     private LocalDateTime publishAt;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Boolean featured;
+
     private Set<CommentDto> comments = new HashSet<>();
 
     // e.g. ["java", "spring"], tags are created on first use.

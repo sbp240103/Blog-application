@@ -15,4 +15,6 @@ public interface AdminService {
 
     void unbanUser(Integer userId);
 
+    void setPostFeatured(Integer postId, boolean featured);
+
 }

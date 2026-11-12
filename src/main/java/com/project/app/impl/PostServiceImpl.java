@@ -86,6 +86,7 @@ public class PostServiceImpl implements PostService {
         Post post = this.modelMapper.map(postDto, Post.class);
         post.setPostId(null);
         post.setViewCount(0);
+        post.setFeatured(false);
         post.setSlug(this.uniqueSlug(postDto.getTitle()));
         post.setStatus(postDto.getStatus() == null ? PostStatus.PUBLISHED : postDto.getStatus());
 
@@ -301,6 +302,13 @@ public class PostServiceImpl implements PostService {
         User me = this.authUtil.getLoggedInUser();
         Page<Post> drafts = this.postRepo.findByUserAndStatus(me, PostStatus.DRAFT, PageUtil.build(pageNumber, pageSize, "postId", "desc"));
         return PageResponse.of(drafts, this.postMapper::toDto);
+    }
+
+    // posts picked by admins, newest first
+    @Override
+    public PageResponse<PostDto> getFeaturedPosts(Integer pageNumber, Integer pageSize){
+        Page<Post> posts = this.postRepo.findByFeaturedTrueAndStatus(PostStatus.PUBLISHED, PageUtil.build(pageNumber, pageSize, "postId", "desc"));
+        return PageResponse.of(posts, this.postMapper::toDto);
     }
 
     // more to read after finishing a post
