@@ -103,6 +103,15 @@ public class PostController {
         return ResponseEntity.ok(this.postService.getPostBySlug(slug));
     }
 
+    // posts related to a post by tags or category
+    @GetMapping("/posts/{postId}/related")
+    public ResponseEntity<List<PostDto>> getRelatedPosts(
+        @PathVariable("postId") Integer postId,
+        @RequestParam (value = "limit", defaultValue = "5", required = false) Integer limit
+    ){
+        return ResponseEntity.ok(this.postService.getRelatedPosts(postId, limit));
+    }
+
     // get posts by user
     @GetMapping("/user/{userId}/posts")
     public ResponseEntity<PageResponse<PostDto>> getPostsByUser(

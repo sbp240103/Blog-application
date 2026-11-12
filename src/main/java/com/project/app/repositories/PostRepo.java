@@ -15,6 +15,8 @@ import com.project.app.entities.PostStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import com.project.app.entities.Tag;
 
 public interface PostRepo extends JpaRepository<Post, Integer> {
 
@@ -43,6 +45,17 @@ public interface PostRepo extends JpaRepository<Post, Integer> {
     @Query ("select p from Post p where p.status = com.project.app.entities.PostStatus.PUBLISHED "
             + "and p.user in (select f.following from Follow f where f.follower = :user)")
     Page<Post> findFeed(@Param("user") User user, Pageable pageable);
+
+    // published posts sharing a tag or the category with the given post
+    @Query ("select distinct p from Post p left join p.tags t where p.status = com.project.app.entities.PostStatus.PUBLISHED "
+            + "and p.postId <> :postId and (p.category = :category or t in :tags) order by p.viewCount desc")
+    List<Post> findRelated(@Param("postId") Integer postId, @Param("category") Category category,
+            @Param("tags") Set<Tag> tags, Pageable pageable);
+
+    // fallback when the post has no tags, an empty in list is not valid sql
+    @Query ("select p from Post p where p.status = com.project.app.entities.PostStatus.PUBLISHED "
+            + "and p.postId <> :postId and p.category = :category order by p.viewCount desc")
+    List<Post> findRelatedByCategory(@Param("postId") Integer postId, @Param("category") Category category, Pageable pageable);
 
     // atomic increment so concurrent readers never lose a view
     @Modifying

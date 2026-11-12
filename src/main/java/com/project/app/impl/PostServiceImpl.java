@@ -303,6 +303,20 @@ public class PostServiceImpl implements PostService {
         return PageResponse.of(drafts, this.postMapper::toDto);
     }
 
+    // more to read after finishing a post
+    @Override
+    public List<PostDto> getRelatedPosts(Integer postId, Integer limit){
+        if (limit == null || limit < 1 || limit > 20) {
+            throw new ApiException("limit must be between 1 and 20");
+        }
+        Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
+        Pageable top = PageRequest.of(0, limit);
+        List<Post> related = post.getTags().isEmpty()
+                ? this.postRepo.findRelatedByCategory(postId, post.getCategory(), top)
+                : this.postRepo.findRelated(postId, post.getCategory(), post.getTags(), top);
+        return related.stream().map(this.postMapper::toDto).collect(Collectors.toList());
+    }
+
     // most viewed posts, newer posts win a tie
     @Override
     public List<PostDto> getTrendingPosts(Integer limit){
