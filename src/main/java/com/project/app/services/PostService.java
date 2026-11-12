@@ -26,6 +26,7 @@ public interface PostService {
     PageResponse<PostDto> getMyDrafts(Integer pageNumber, Integer pageSize);
     List<PostDto> getTrendingPosts(Integer limit);
     PageResponse<PostDto> getFeaturedPosts(Integer pageNumber, Integer pageSize);
+    PageResponse<PostDto> getArchive(Integer year, Integer month, Integer pageNumber, Integer pageSize);
     List<PostDto> getRelatedPosts(Integer postId, Integer limit);
     PageResponse<PostDto> searchPosts(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortDirection);
 }

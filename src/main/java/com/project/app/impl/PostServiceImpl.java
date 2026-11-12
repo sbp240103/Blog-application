@@ -40,6 +40,7 @@ import com.project.app.entities.PostStatus;
 import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import com.project.app.utils.SlugUtil;
+import java.time.LocalDate;
 
 @Service 
 public class PostServiceImpl implements PostService {
@@ -308,6 +309,24 @@ public class PostServiceImpl implements PostService {
     @Override
     public PageResponse<PostDto> getFeaturedPosts(Integer pageNumber, Integer pageSize){
         Page<Post> posts = this.postRepo.findByFeaturedTrueAndStatus(PostStatus.PUBLISHED, PageUtil.build(pageNumber, pageSize, "postId", "desc"));
+        return PageResponse.of(posts, this.postMapper::toDto);
+    }
+
+    // published posts of a year, or of one month when month is given
+    @Override
+    public PageResponse<PostDto> getArchive(Integer year, Integer month, Integer pageNumber, Integer pageSize){
+        if (year == null || year < 2000 || year > 2100) {
+            throw new ApiException("year must be between 2000 and 2100");
+        }
+        if (month != null && (month < 1 || month > 12)) {
+            throw new ApiException("month must be between 1 and 12");
+        }
+
+        LocalDate from = month == null ? LocalDate.of(year, 1, 1) : LocalDate.of(year, month, 1);
+        LocalDate to = month == null ? from.withDayOfYear(from.lengthOfYear()) : from.withDayOfMonth(from.lengthOfMonth());
+
+        Page<Post> posts = this.postRepo.findByStatusAndAddDateBetween(PostStatus.PUBLISHED, Date.valueOf(from), Date.valueOf(to),
+                PageUtil.build(pageNumber, pageSize, "addDate", "desc"));
         return PageResponse.of(posts, this.postMapper::toDto);
     }
 

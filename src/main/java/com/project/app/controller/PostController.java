@@ -145,6 +145,17 @@ public class PostController {
         return ResponseEntity.ok(this.postService.getMyDrafts(pageNumber, pageSize));
     }
 
+    // archive, e.g. /api/posts/archive?year=2026&month=11
+    @GetMapping("/posts/archive")
+    public ResponseEntity<PageResponse<PostDto>> getArchive(
+        @RequestParam (value = "year") Integer year,
+        @RequestParam (value = "month", required = false) Integer month,
+        @RequestParam (value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+        @RequestParam (value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize
+    ){
+        return ResponseEntity.ok(this.postService.getArchive(year, month, pageNumber, pageSize));
+    }
+
     // posts picked by admins
     @GetMapping("/posts/featured")
     public ResponseEntity<PageResponse<PostDto>> getFeaturedPosts(
