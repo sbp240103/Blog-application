@@ -38,6 +38,10 @@ import com.project.app.entities.PostStatus;
 import com.project.app.payloads.ProfileDto;
 import com.project.app.repositories.PostRepo;
 import com.project.app.payloads.MyStatsDto;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.data.domain.PageRequest;
+import com.project.app.payloads.TopAuthorDto;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -154,6 +158,25 @@ public class UserServiceImpl implements UserService {
                 this.followRepo.countByFollowing(user),
                 this.followRepo.countByFollower(user),
                 this.postLikeRepo.countByPostUser(user));
+    }
+
+    // most followed users, banned accounts are skipped
+    @Override
+    public List<TopAuthorDto> getTopAuthors(Integer limit) {
+        if (limit == null || limit < 1 || limit > 50) {
+            throw new ApiException("limit must be between 1 and 50");
+        }
+        List<TopAuthorDto> result = new ArrayList<>();
+        for (Object[] row : this.followRepo.findMostFollowed(PageRequest.of(0, limit * 2))) {
+            User user = this.userRepo.findById((Integer) row[0]).orElse(null);
+            if (user != null && !Boolean.FALSE.equals(user.getEnabled())) {
+                result.add(new TopAuthorDto(this.userToDto(user), (Long) row[1]));
+            }
+            if (result.size() == limit) {
+                break;
+            }
+        }
+        return result;
     }
 
     // find people by name, used for the search box and mentions

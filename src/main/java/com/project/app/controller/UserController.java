@@ -33,6 +33,8 @@ import com.project.app.services.FileService;
 import jakarta.servlet.http.HttpServletResponse;
 import com.project.app.payloads.ProfileDto;
 import com.project.app.payloads.MyStatsDto;
+import java.util.List;
+import com.project.app.payloads.TopAuthorDto;
 
 @RestController
 @RequestMapping("/api/users")
@@ -79,6 +81,14 @@ public class UserController {
         @RequestParam (value = "sortDirection", defaultValue = AppConstants.SORT_DIRECTION, required = false) String sortDirection
     ){
         return ResponseEntity.ok(this.userService.getAllUsers(pageNumber, pageSize, sortBy, sortDirection));
+    }
+
+    // most followed authors
+    @GetMapping("/top-authors")
+    public ResponseEntity<List<TopAuthorDto>> getTopAuthors(
+        @RequestParam (value = "limit", defaultValue = "10", required = false) Integer limit
+    ){
+        return ResponseEntity.ok(this.userService.getTopAuthors(limit));
     }
 
     // search users by name

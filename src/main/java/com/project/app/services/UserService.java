@@ -8,6 +8,8 @@ import java.io.IOException;
 import org.springframework.web.multipart.MultipartFile;
 import com.project.app.payloads.ProfileDto;
 import com.project.app.payloads.MyStatsDto;
+import java.util.List;
+import com.project.app.payloads.TopAuthorDto;
 
 public interface UserService {
 
@@ -18,6 +20,7 @@ public interface UserService {
     UserDto getCurrentUser();
     MyStatsDto getMyStats();
     ProfileDto getProfile(Integer userId);
+    List<TopAuthorDto> getTopAuthors(Integer limit);
     PageResponse<UserDto> searchUsers(String keyword, Integer pageNumber, Integer pageSize);
     void changePassword(ChangePasswordRequest request);
     UserDto updateProfile(UpdateProfileRequest request);
