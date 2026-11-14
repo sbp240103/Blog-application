@@ -10,6 +10,8 @@ import com.project.app.entities.Follow;
 import com.project.app.entities.User;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
+import java.util.Set;
+import org.springframework.data.repository.query.Param;
 
 public interface FollowRepo extends JpaRepository<Follow, Integer> {
 
@@ -24,6 +26,9 @@ public interface FollowRepo extends JpaRepository<Follow, Integer> {
     Page<Follow> findByFollower(User follower, Pageable pageable);
 
     long countByFollowing(User following);
+
+    @Query("select f.following.id from Follow f where f.follower = :follower")
+    Set<Integer> findFollowingIds(@Param("follower") User follower);
 
     // [userId, followerCount] rows, most followed first
     @Query("select f.following.id, count(f) from Follow f group by f.following.id order by count(f) desc")

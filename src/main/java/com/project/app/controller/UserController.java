@@ -107,6 +107,14 @@ public class UserController {
         return ResponseEntity.ok(this.userService.getCurrentUser());
     }
 
+    // people the logged in user may want to follow
+    @GetMapping("/me/suggestions")
+    public ResponseEntity<List<UserDto>> getFollowSuggestions(
+        @RequestParam (value = "limit", defaultValue = "5", required = false) Integer limit
+    ){
+        return ResponseEntity.ok(this.userService.getFollowSuggestions(limit));
+    }
+
     // personal dashboard numbers
     @GetMapping("/me/stats")
     public ResponseEntity<MyStatsDto> getMyStats(){

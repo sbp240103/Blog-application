@@ -42,6 +42,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import com.project.app.payloads.TopAuthorDto;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -177,6 +181,37 @@ public class UserServiceImpl implements UserService {
             }
         }
         return result;
+    }
+
+    // popular people the logged in user does not follow yet, topped up with newest members
+    @Override
+    public List<UserDto> getFollowSuggestions(Integer limit) {
+        if (limit == null || limit < 1 || limit > 20) {
+            throw new ApiException("limit must be between 1 and 20");
+        }
+        User me = this.authUtil.getLoggedInUser();
+        Set<Integer> skip = new HashSet<>(this.followRepo.findFollowingIds(me));
+        skip.add(me.getId());
+
+        Set<Integer> candidates = new LinkedHashSet<>();
+        for (Object[] row : this.followRepo.findMostFollowed(PageRequest.of(0, 50))) {
+            candidates.add((Integer) row[0]);
+        }
+        this.userRepo.findAll(PageRequest.of(0, 50, Sort.by("id").descending())).forEach(user -> candidates.add(user.getId()));
+
+        List<UserDto> suggestions = new ArrayList<>();
+        for (Integer id : candidates) {
+            if (suggestions.size() == limit) {
+                break;
+            }
+            if (skip.contains(id)) {
+                continue;
+            }
+            this.userRepo.findById(id)
+                    .filter(user -> !Boolean.FALSE.equals(user.getEnabled()))
+                    .ifPresent(user -> suggestions.add(this.userToDto(user)));
+        }
+        return suggestions;
     }
 
     // find people by name, used for the search box and mentions

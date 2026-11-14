@@ -21,6 +21,7 @@ public interface UserService {
     MyStatsDto getMyStats();
     ProfileDto getProfile(Integer userId);
     List<TopAuthorDto> getTopAuthors(Integer limit);
+    List<UserDto> getFollowSuggestions(Integer limit);
     PageResponse<UserDto> searchUsers(String keyword, Integer pageNumber, Integer pageSize);
     void changePassword(ChangePasswordRequest request);
     UserDto updateProfile(UpdateProfileRequest request);
