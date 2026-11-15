@@ -46,6 +46,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import org.springframework.data.domain.Sort;
+import com.project.app.repositories.ReportRepo;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -91,6 +92,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PostRepo postRepo;
+
+    @Autowired
+    private ReportRepo reportRepo;
 
     @Value("${project.image}")
     private String imagePath;
@@ -307,6 +311,8 @@ public class UserServiceImpl implements UserService {
         this.notificationRepo.deleteByRecipientOrActor(user, user);
         this.refreshTokenRepo.deleteByUser(user);
         this.passwordResetTokenRepo.deleteByUser(user);
+        this.reportRepo.deleteByReporter(user);
+        this.reportRepo.clearResolver(user);
 
         String avatar = user.getAvatarImage();
         this.userRepo.delete(user);
