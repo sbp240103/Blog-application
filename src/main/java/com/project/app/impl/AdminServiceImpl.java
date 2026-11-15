@@ -27,6 +27,15 @@ import com.project.app.repositories.RefreshTokenRepo;
 import org.springframework.transaction.annotation.Transactional;
 import com.project.app.entities.Post;
 import com.project.app.entities.PostStatus;
+import java.time.LocalDateTime;
+import org.springframework.data.domain.Page;
+import com.project.app.entities.Report;
+import com.project.app.entities.ReportStatus;
+import com.project.app.entities.ReportTargetType;
+import com.project.app.payloads.PageResponse;
+import com.project.app.payloads.ReportDto;
+import com.project.app.repositories.ReportRepo;
+import com.project.app.utils.PageUtil;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -66,6 +75,9 @@ public class AdminServiceImpl implements AdminService {
 
     @Autowired
     private RefreshTokenRepo refreshTokenRepo;
+
+    @Autowired
+    private ReportRepo reportRepo;
 
     @Override
     public UserDto promoteToAdmin(Integer userId) {
@@ -142,6 +154,48 @@ public class AdminServiceImpl implements AdminService {
         }
         post.setFeatured(featured);
         this.postRepo.save(post);
+    }
+
+    // oldest open reports first so nothing waits forever
+    @Override
+    public PageResponse<ReportDto> getReports(ReportStatus status, Integer pageNumber, Integer pageSize) {
+        Page<Report> page = this.reportRepo.findByStatus(status, PageUtil.build(pageNumber, pageSize, "createdAt", "asc"));
+        return PageResponse.of(page, ReportServiceImpl::toDto);
+    }
+
+    // resolving can also take the reported post or comment down
+    @Override
+    @Transactional
+    public ReportDto resolveReport(Integer reportId, boolean removeContent) {
+        Report report = this.openReport(reportId);
+        if (removeContent) {
+            if (report.getTargetType() == ReportTargetType.POST) {
+                this.postRepo.findById(report.getTargetId()).ifPresent(this.postRepo::delete);
+            } else {
+                this.commentRepo.findById(report.getTargetId()).ifPresent(this.commentRepo::delete);
+            }
+        }
+        return this.close(report, ReportStatus.RESOLVED);
+    }
+
+    @Override
+    public ReportDto dismissReport(Integer reportId) {
+        return this.close(this.openReport(reportId), ReportStatus.DISMISSED);
+    }
+
+    private Report openReport(Integer reportId) {
+        Report report = this.reportRepo.findById(reportId).orElseThrow(() -> new ResouceNotFoundException("Report", "Id", reportId));
+        if (report.getStatus() != ReportStatus.OPEN) {
+            throw new ApiException("report is already closed", HttpStatus.CONFLICT);
+        }
+        return report;
+    }
+
+    private ReportDto close(Report report, ReportStatus status) {
+        report.setStatus(status);
+        report.setResolvedAt(LocalDateTime.now());
+        report.setResolvedBy(this.authUtil.getLoggedInUser());
+        return ReportServiceImpl.toDto(this.reportRepo.save(report));
     }
 
     private Role adminRole() {

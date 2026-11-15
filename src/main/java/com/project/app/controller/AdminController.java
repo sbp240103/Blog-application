@@ -13,6 +13,11 @@ import com.project.app.payloads.StatsDto;
 import com.project.app.payloads.UserDto;
 import com.project.app.services.AdminService;
 import com.project.app.payloads.ApiResponse;
+import org.springframework.web.bind.annotation.RequestParam;
+import com.project.app.config.AppConstants;
+import com.project.app.entities.ReportStatus;
+import com.project.app.payloads.PageResponse;
+import com.project.app.payloads.ReportDto;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -52,6 +57,30 @@ public class AdminController {
     public ResponseEntity<ApiResponse> unfeaturePost(@PathVariable("postId") Integer postId) {
         this.adminService.setPostFeatured(postId, false);
         return ResponseEntity.ok(new ApiResponse("post removed from featured", true));
+    }
+
+    // moderation queue, open reports by default
+    @GetMapping("/reports")
+    public ResponseEntity<PageResponse<ReportDto>> getReports(
+        @RequestParam(value = "status", defaultValue = "OPEN", required = false) ReportStatus status,
+        @RequestParam(value = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+        @RequestParam(value = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize
+    ) {
+        return ResponseEntity.ok(this.adminService.getReports(status, pageNumber, pageSize));
+    }
+
+    // close a report, optionally removing the reported content
+    @PutMapping("/reports/{reportId}/resolve")
+    public ResponseEntity<ReportDto> resolveReport(
+        @PathVariable("reportId") Integer reportId,
+        @RequestParam(value = "removeContent", defaultValue = "false", required = false) boolean removeContent
+    ) {
+        return ResponseEntity.ok(this.adminService.resolveReport(reportId, removeContent));
+    }
+
+    @PutMapping("/reports/{reportId}/dismiss")
+    public ResponseEntity<ReportDto> dismissReport(@PathVariable("reportId") Integer reportId) {
+        return ResponseEntity.ok(this.adminService.dismissReport(reportId));
     }
 
     // give a user the admin role

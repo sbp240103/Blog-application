@@ -54,7 +54,7 @@ public class ReportServiceImpl implements ReportService {
         return toDto(this.reportRepo.save(report));
     }
 
-    static ReportDto toDto(Report report) {
+    public static ReportDto toDto(Report report) {
         ReportDto dto = new ReportDto();
         dto.setId(report.getId());
         dto.setTargetType(report.getTargetType());
