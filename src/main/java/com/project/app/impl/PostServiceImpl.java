@@ -41,6 +41,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import com.project.app.utils.SlugUtil;
 import java.time.LocalDate;
+import com.project.app.utils.ContentFilter;
 
 @Service 
 public class PostServiceImpl implements PostService {
@@ -69,6 +70,9 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private FileService fileService;
 
+    @Autowired
+    private ContentFilter contentFilter;
+
     @Value("${project.image}")
     private String imagePath;
 
@@ -77,6 +81,8 @@ public class PostServiceImpl implements PostService {
     public PostDto createPost(PostDto postDto, Integer userId, Integer categoryId){
         User user = this.userRepo.findById(userId).orElseThrow(()-> new ResouceNotFoundException("User", "Id", userId));
         Category category = this.categoryRepo.findById(categoryId).orElseThrow(()-> new ResouceNotFoundException("Category", "Id", categoryId));
+
+        this.contentFilter.check(postDto.getTitle(), postDto.getContent());
 
         // nobody can publish a post in somebody else's name, except an admin
         User loggedInUser = this.authUtil.getLoggedInUser();
@@ -113,6 +119,7 @@ public class PostServiceImpl implements PostService {
     public PostDto updatePost(PostDto postDto, Integer postId){
         Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
         this.checkOwnerOrAdmin(post);
+        this.contentFilter.check(postDto.getTitle(), postDto.getContent());
 
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());

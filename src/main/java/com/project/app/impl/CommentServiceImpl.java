@@ -22,6 +22,7 @@ import com.project.app.payloads.PageResponse;
 import com.project.app.utils.PageUtil;
 import com.project.app.entities.NotificationType;
 import com.project.app.services.NotificationService;
+import com.project.app.utils.ContentFilter;
 
 @Service 
 public class CommentServiceImpl implements CommentService {
@@ -41,10 +42,15 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private NotificationService notificationService;
 
+    @Autowired
+    private ContentFilter contentFilter;
+
     // create
     @Override
     public CommentDto createComment(CommentDto commentDto, Integer postId) {
         Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "post id", postId));
+
+        this.contentFilter.check(commentDto.getContent());
 
         Comments comment = new Comments();
         comment.setContent(commentDto.getContent());
@@ -62,6 +68,8 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto createReply(CommentDto commentDto, Integer commentId) {
         Comments target = this.commentRepo.findById(commentId).orElseThrow(()-> new ResouceNotFoundException("Comment", "comment id", commentId));
         Comments parent = target.getParent() != null ? target.getParent() : target;
+
+        this.contentFilter.check(commentDto.getContent());
 
         Comments reply = new Comments();
         reply.setContent(commentDto.getContent());
@@ -94,6 +102,7 @@ public class CommentServiceImpl implements CommentService {
             throw new AccessDeniedException("only the author can edit this comment");
         }
 
+        this.contentFilter.check(commentDto.getContent());
         comment.setContent(commentDto.getContent());
         Comments updatedComment = this.commentRepo.save(comment);
         return this.modelMapper.map(updatedComment, CommentDto.class);
