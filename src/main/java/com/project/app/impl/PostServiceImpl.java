@@ -42,6 +42,7 @@ import java.time.LocalDateTime;
 import com.project.app.utils.SlugUtil;
 import java.time.LocalDate;
 import com.project.app.utils.ContentFilter;
+import org.springframework.cache.annotation.CacheEvict;
 
 @Service 
 public class PostServiceImpl implements PostService {
@@ -78,6 +79,7 @@ public class PostServiceImpl implements PostService {
 
     // create
     @Override
+    @CacheEvict(value = {"tags", "popularTags"}, allEntries = true)
     public PostDto createPost(PostDto postDto, Integer userId, Integer categoryId){
         User user = this.userRepo.findById(userId).orElseThrow(()-> new ResouceNotFoundException("User", "Id", userId));
         Category category = this.categoryRepo.findById(categoryId).orElseThrow(()-> new ResouceNotFoundException("Category", "Id", categoryId));
@@ -116,6 +118,7 @@ public class PostServiceImpl implements PostService {
 
     // update
     @Override
+    @CacheEvict(value = {"tags", "popularTags"}, allEntries = true)
     public PostDto updatePost(PostDto postDto, Integer postId){
         Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
         this.checkOwnerOrAdmin(post);
@@ -139,6 +142,7 @@ public class PostServiceImpl implements PostService {
 
     // delete
     @Override
+    @CacheEvict(value = {"tags", "popularTags"}, allEntries = true)
     public void deletePost(Integer postId){
         Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
         this.checkOwnerOrAdmin(post);
@@ -149,6 +153,7 @@ public class PostServiceImpl implements PostService {
 
     // make a draft visible to everyone, the publish time becomes the post date
     @Override
+    @CacheEvict(value = {"tags", "popularTags"}, allEntries = true)
     public PostDto publishPost(Integer postId) {
         Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
         this.checkOwnerOrAdmin(post);
@@ -162,6 +167,7 @@ public class PostServiceImpl implements PostService {
 
     // take a post back to draft
     @Override
+    @CacheEvict(value = {"tags", "popularTags"}, allEntries = true)
     public PostDto unpublishPost(Integer postId) {
         Post post = this.postRepo.findById(postId).orElseThrow(()-> new ResouceNotFoundException("Post", "Id", postId));
         this.checkOwnerOrAdmin(post);

@@ -12,6 +12,7 @@ import com.project.app.repositories.TagRepo;
 import com.project.app.services.TagService;
 import org.springframework.data.domain.PageRequest;
 import com.project.app.exceptions.ApiException;
+import org.springframework.cache.annotation.Cacheable;
 
 @Service
 public class TagServiceImpl implements TagService {
@@ -21,6 +22,7 @@ public class TagServiceImpl implements TagService {
 
     // tags used by the most published posts
     @Override
+    @Cacheable(value = "popularTags", key = "#limit")
     public List<TagDto> getPopularTags(Integer limit) {
         if (limit == null || limit < 1 || limit > 50) {
             throw new ApiException("limit must be between 1 and 50");
@@ -30,6 +32,7 @@ public class TagServiceImpl implements TagService {
 
     // alphabetical list of every tag in use
     @Override
+    @Cacheable("tags")
     public List<TagDto> getAllTags() {
         return this.tagRepo.findAll(Sort.by("name")).stream()
                 .map(tag -> new TagDto(tag.getId(), tag.getName()))

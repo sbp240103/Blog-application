@@ -13,6 +13,8 @@ import com.project.app.payloads.PageResponse;
 import com.project.app.services.CategoryService;
 import com.project.app.exceptions.ResouceNotFoundException;
 import com.project.app.config.AppConstants;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 @Service 
 public class CategoryServiceImpl implements CategoryService {
@@ -28,6 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     // create
     @Override
+    @CacheEvict(value = "categories", allEntries = true)
     public CategoryDto createCategory(CategoryDto categoryDto){
         Category category = this.modelMapper.map(categoryDto, Category.class);
         Category savedCategory = this.categoryRepo.save(category);
@@ -36,6 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     // update
     @Override
+    @CacheEvict(value = "categories", allEntries = true)
     public  CategoryDto updateCategory(CategoryDto categoryDto, Integer Id){
         Category category = this.categoryRepo.findById(Id).orElseThrow(()-> new ResouceNotFoundException("Category", "Id", Id));
         category.setCategoryTitle(categoryDto.getCategoryTitle());
@@ -46,6 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     // delete
     @Override
+    @CacheEvict(value = "categories", allEntries = true)
     public void  deleteCategory(Integer Id){
         Category category = this.categoryRepo.findById(Id).orElseThrow(()-> new ResouceNotFoundException("Category", "Id", Id));
         this.categoryRepo.delete(category);
@@ -60,6 +65,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     // getall
     @Override
+    @Cacheable(value = "categories", key = "#pageNumber + '-' + #pageSize + '-' + #sortBy + '-' + #sortDirection")
     public PageResponse<CategoryDto> getAllCategory(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection){
         Page<Category> page = this.categoryRepo.findAll(PageUtil.build(pageNumber, pageSize, sortBy, sortDirection, AppConstants.CATEGORY_SORT_FIELDS));
         return PageResponse.of(page, category -> this.modelMapper.map(category, CategoryDto.class));
