@@ -32,6 +32,8 @@ import com.project.app.services.LoginAttemptService;
 import com.project.app.payloads.ForgotPasswordRequest;
 import com.project.app.payloads.ResetPasswordRequest;
 import com.project.app.services.PasswordResetService;
+import com.project.app.security.LoginRateLimiter;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -64,9 +66,14 @@ public class AuthController {
     @Autowired
     private PasswordResetService passwordResetService;
 
+    @Autowired
+    private LoginRateLimiter loginRateLimiter;
+
     // login and hand back a token along with the logged in user
     @PostMapping("/login")
-    public ResponseEntity<JwtAuthResponse> createToken(@Valid @RequestBody JwtAuthRequest request) {
+    public ResponseEntity<JwtAuthResponse> createToken(@Valid @RequestBody JwtAuthRequest request, HttpServletRequest httpRequest) {
+
+        this.loginRateLimiter.check("login:" + httpRequest.getRemoteAddr());
 
         this.authenticate(request.getEmail(), request.getPassword());
 
@@ -102,7 +109,8 @@ public class AuthController {
 
     // always answers the same way so it does not reveal which emails are registered
     @PostMapping("/forgot-password")
-    public ResponseEntity<ApiResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+    public ResponseEntity<ApiResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request, HttpServletRequest httpRequest) {
+        this.loginRateLimiter.check("forgot:" + httpRequest.getRemoteAddr());
         this.passwordResetService.requestReset(request.getEmail());
         return ResponseEntity.ok(new ApiResponse("if the email is registered, a reset link has been sent", true));
     }
