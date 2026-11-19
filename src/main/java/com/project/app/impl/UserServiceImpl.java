@@ -47,6 +47,10 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.springframework.data.domain.Sort;
 import com.project.app.repositories.ReportRepo;
+import org.springframework.data.domain.Pageable;
+import com.project.app.payloads.CommentDto;
+import com.project.app.payloads.DataExportDto;
+import com.project.app.utils.PostMapper;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -95,6 +99,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ReportRepo reportRepo;
+
+    @Autowired
+    private PostMapper postMapper;
 
     @Value("${project.image}")
     private String imagePath;
@@ -240,6 +247,23 @@ public class UserServiceImpl implements UserService {
                 this.followRepo.countByFollowing(me),
                 this.followRepo.countByFollower(me),
                 this.bookmarkRepo.countByUser(me));
+    }
+
+    // download of all personal data in one json document
+    @Override
+    public DataExportDto exportMyData() {
+        User me = this.authUtil.getLoggedInUser();
+
+        DataExportDto export = new DataExportDto();
+        export.setProfile(this.userToDto(me));
+        export.setPosts(this.postRepo.findByUser(me, Pageable.unpaged()).stream().map(this.postMapper::toDto).toList());
+        export.setComments(this.commentRepo.findByUserOrderByIdAsc(me).stream()
+                .map(comment -> this.modelMapper.map(comment, CommentDto.class)).toList());
+        export.setBookmarkedPostIds(this.bookmarkRepo.findByUser(me, Pageable.unpaged()).stream()
+                .map(bookmark -> bookmark.getPost().getPostId()).toList());
+        export.setFollowingUserIds(this.followRepo.findFollowingIds(me));
+        export.setFollowers(this.followRepo.countByFollowing(me));
+        return export;
     }
 
     @Override

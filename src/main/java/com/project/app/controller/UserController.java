@@ -35,6 +35,8 @@ import com.project.app.payloads.ProfileDto;
 import com.project.app.payloads.MyStatsDto;
 import java.util.List;
 import com.project.app.payloads.TopAuthorDto;
+import org.springframework.http.HttpHeaders;
+import com.project.app.payloads.DataExportDto;
 
 @RestController
 @RequestMapping("/api/users")
@@ -113,6 +115,14 @@ public class UserController {
         @RequestParam (value = "limit", defaultValue = "5", required = false) Integer limit
     ){
         return ResponseEntity.ok(this.userService.getFollowSuggestions(limit));
+    }
+
+    // download everything stored about the logged in user
+    @GetMapping("/me/export")
+    public ResponseEntity<DataExportDto> exportMyData(){
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"my-data.json\"")
+                .body(this.userService.exportMyData());
     }
 
     // personal dashboard numbers

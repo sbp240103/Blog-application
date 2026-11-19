@@ -10,6 +10,7 @@ import com.project.app.payloads.ProfileDto;
 import com.project.app.payloads.MyStatsDto;
 import java.util.List;
 import com.project.app.payloads.TopAuthorDto;
+import com.project.app.payloads.DataExportDto;
 
 public interface UserService {
 
@@ -19,6 +20,7 @@ public interface UserService {
     UserDto getUserById(Integer userId);
     UserDto getCurrentUser();
     MyStatsDto getMyStats();
+    DataExportDto exportMyData();
     ProfileDto getProfile(Integer userId);
     List<TopAuthorDto> getTopAuthors(Integer limit);
     List<UserDto> getFollowSuggestions(Integer limit);
