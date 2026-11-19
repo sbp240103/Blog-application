@@ -51,6 +51,7 @@ import org.springframework.data.domain.Pageable;
 import com.project.app.payloads.CommentDto;
 import com.project.app.payloads.DataExportDto;
 import com.project.app.utils.PostMapper;
+import com.project.app.payloads.DeleteAccountRequest;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -326,7 +327,21 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Integer userId) {
         User user = this.userRepo.findById(userId).orElseThrow(()-> new ResouceNotFoundException("User", "Id", userId));
+        this.removeUser(user);
+    }
 
+    // users can close their own account after confirming the password
+    @Override
+    @Transactional
+    public void deleteMyAccount(DeleteAccountRequest request) {
+        User me = this.authUtil.getLoggedInUser();
+        if (!this.passwordEncoder.matches(request.getPassword(), me.getPassword())) {
+            throw new ApiException("password is incorrect");
+        }
+        this.removeUser(me);
+    }
+
+    private void removeUser(User user) {
         // remove what this user wrote on other people's posts, own posts go with the user
         this.commentRepo.deleteByUser(user);
         this.postLikeRepo.deleteByUser(user);

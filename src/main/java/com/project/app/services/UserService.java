@@ -11,6 +11,7 @@ import com.project.app.payloads.MyStatsDto;
 import java.util.List;
 import com.project.app.payloads.TopAuthorDto;
 import com.project.app.payloads.DataExportDto;
+import com.project.app.payloads.DeleteAccountRequest;
 
 public interface UserService {
 
@@ -30,4 +31,5 @@ public interface UserService {
     UserDto uploadAvatar(MultipartFile image) throws IOException;
     PageResponse<UserDto> getAllUsers(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection);
     void deleteUser(Integer userId);
+    void deleteMyAccount(DeleteAccountRequest request);
 }

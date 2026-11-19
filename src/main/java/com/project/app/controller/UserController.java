@@ -37,6 +37,7 @@ import java.util.List;
 import com.project.app.payloads.TopAuthorDto;
 import org.springframework.http.HttpHeaders;
 import com.project.app.payloads.DataExportDto;
+import com.project.app.payloads.DeleteAccountRequest;
 
 @RestController
 @RequestMapping("/api/users")
@@ -123,6 +124,13 @@ public class UserController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"my-data.json\"")
                 .body(this.userService.exportMyData());
+    }
+
+    // close the logged in user's account, the password is required
+    @DeleteMapping("/me")
+    public ResponseEntity<ApiResponse> deleteMyAccount(@Valid @RequestBody DeleteAccountRequest request){
+        this.userService.deleteMyAccount(request);
+        return ResponseEntity.ok(new ApiResponse("your account has been deleted", true));
     }
 
     // personal dashboard numbers
