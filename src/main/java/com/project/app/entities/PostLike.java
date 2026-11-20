@@ -17,7 +17,7 @@ import lombok.Setter;
 
 // a user can like a post only once
 @Entity
-@Table(name = "post_likes", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "post_id"}))
+@Table(name = "post_likes", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "post_post_id"}))
 @NoArgsConstructor
 @Getter
 @Setter

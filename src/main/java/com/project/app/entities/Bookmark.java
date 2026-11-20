@@ -17,7 +17,7 @@ import lombok.Setter;
 
 // a post saved by a user to read later
 @Entity
-@Table(name = "bookmarks", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "post_id"}))
+@Table(name = "bookmarks", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "post_post_id"}))
 @NoArgsConstructor
 @Getter
 @Setter
