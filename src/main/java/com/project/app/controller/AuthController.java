@@ -34,8 +34,10 @@ import com.project.app.payloads.ResetPasswordRequest;
 import com.project.app.services.PasswordResetService;
 import com.project.app.security.LoginRateLimiter;
 import jakarta.servlet.http.HttpServletRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "Authentication", description = "register, login, refresh tokens, logout and password reset")
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 

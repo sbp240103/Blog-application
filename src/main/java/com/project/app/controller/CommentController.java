@@ -22,8 +22,10 @@ import com.project.app.payloads.ApiResponse;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.project.app.config.AppConstants;
 import com.project.app.payloads.PageResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "Comments", description = "comments and replies on posts")
 @RequestMapping("/api")
 public class CommentController {
 

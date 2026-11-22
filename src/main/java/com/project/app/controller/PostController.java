@@ -31,8 +31,10 @@ import jakarta.validation.Valid;
 import com.project.app.services.FileService;
 import com.project.app.services.PostService;
 import com.project.app.payloads.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "Posts", description = "writing, publishing, browsing and searching posts")
 @RequestMapping("/api")
 public class PostController {
 

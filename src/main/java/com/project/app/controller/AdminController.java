@@ -18,8 +18,10 @@ import com.project.app.config.AppConstants;
 import com.project.app.entities.ReportStatus;
 import com.project.app.payloads.PageResponse;
 import com.project.app.payloads.ReportDto;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "Admin", description = "moderation, user roles and platform stats, admin only")
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {

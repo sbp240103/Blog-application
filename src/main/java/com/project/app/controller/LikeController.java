@@ -15,8 +15,10 @@ import com.project.app.payloads.ApiResponse;
 import com.project.app.payloads.PageResponse;
 import com.project.app.payloads.UserDto;
 import com.project.app.services.LikeService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "Likes", description = "liking posts")
 @RequestMapping("/api/posts/{postId}")
 public class LikeController {
 

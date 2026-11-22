@@ -15,8 +15,10 @@ import com.project.app.payloads.ApiResponse;
 import com.project.app.payloads.PageResponse;
 import com.project.app.payloads.PostDto;
 import com.project.app.services.BookmarkService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "Bookmarks", description = "saving posts to read later")
 @RequestMapping("/api")
 public class BookmarkController {
 

@@ -13,8 +13,10 @@ import com.project.app.payloads.ReportRequest;
 import com.project.app.services.ReportService;
 
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "Reports", description = "reporting posts and comments")
 @RequestMapping("/api/reports")
 public class ReportController {
 

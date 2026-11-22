@@ -16,8 +16,10 @@ import com.project.app.payloads.FollowStatsDto;
 import com.project.app.payloads.PageResponse;
 import com.project.app.payloads.UserDto;
 import com.project.app.services.FollowService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "Follows", description = "following other users")
 @RequestMapping("/api/users/{userId}")
 public class FollowController {
 

@@ -16,8 +16,10 @@ import com.project.app.payloads.ApiResponse;
 import com.project.app.payloads.NotificationDto;
 import com.project.app.payloads.PageResponse;
 import com.project.app.services.NotificationService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "Notifications", description = "activity notifications for the logged in user")
 @RequestMapping("/api/notifications")
 public class NotificationController {
 

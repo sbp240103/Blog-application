@@ -20,8 +20,10 @@ import com.project.app.payloads.PageResponse;
 import jakarta.validation.Valid;
 import com.project.app.services.CategoryService;
 import com.project.app.payloads.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "Categories", description = "post categories")
 @RequestMapping("/api/categories")
 public class CategoryController {
 

@@ -38,8 +38,10 @@ import com.project.app.payloads.TopAuthorDto;
 import org.springframework.http.HttpHeaders;
 import com.project.app.payloads.DataExportDto;
 import com.project.app.payloads.DeleteAccountRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
+@Tag(name = "Users", description = "accounts, profiles, avatars, stats and data export")
 @RequestMapping("/api/users")
 public class UserController {
 

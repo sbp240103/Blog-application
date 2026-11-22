@@ -18,6 +18,7 @@ import com.project.app.services.PostService;
 import com.project.app.services.TagService;
 
 @RestController
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Tags", description = "post tags")
 @RequestMapping("/api/tags")
 public class TagController {
 
